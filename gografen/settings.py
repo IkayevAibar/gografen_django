@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'app.apps.AppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
+    'rest_framework',
+    'djoser',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -126,3 +128,17 @@ USE_TZ = True
 STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'app.appUser'
 STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        # 'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+
+}
+
+SIMPLE_JWT = {
+#    'AUTH_HEADER_TYPES': ('JWT',),
+}

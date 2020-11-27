@@ -1,6 +1,15 @@
 from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpRequest
+from .serializers import GetappUserSerializer
+from rest_framework.generics import RetrieveAPIView
+from .models import appUser
+
+class GetappUserView(RetrieveAPIView):
+    #get user info to view
+    queryset = appUser.objects.all()
+    serializer_class = GetappUserSerializer
+
 
 def home(request):
     """Renders the home page."""
@@ -10,6 +19,19 @@ def home(request):
         'app/index.html',
         {
             'title':'Home Page',
+            'year':datetime.now().year,
+        }
+    )
+
+def register(request):
+    """Renders the register page."""
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/register.html',
+        {
+            'title':'About',
+            'message':'Your application description page.',
             'year':datetime.now().year,
         }
     )
