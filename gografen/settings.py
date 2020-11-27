@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'rest_framework',
     'djoser',
+    'drf_yasg',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -142,3 +143,13 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
 #    'AUTH_HEADER_TYPES': ('JWT',),
 }
+
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:8080",
+    "http://localhost:8081",
+    "http://localhost:1313",
+    "http://127.0.0.1:1313",
+
+]
