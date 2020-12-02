@@ -21,9 +21,25 @@ from app import views
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls ,name='admin'),
     path('api-auth/', include('rest_framework.urls')),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
     path('api/v1/',include('app.routers')),
+    path('', views.home, name='home'),
+    path('contact/', views.contact, name='contact'),
+    path('about/', views.about, name='about'),
+    path('register/', views.register, name='register'),
+    path('login/',
+         LoginView.as_view
+         (
+             template_name='app/login.html',
+             extra_context=
+             {
+                 'title': 'Log in',
+                 'year' : datetime.now().year,
+             }
+         ),
+         name='login'),
+    path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
 ]
