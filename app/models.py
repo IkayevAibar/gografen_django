@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 import datetime
 from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 class appUser(AbstractUser):
@@ -10,7 +11,7 @@ class appUser(AbstractUser):
             ("can_add_comment","Can add comments"),
             ("can_edit_user_data","Can edit user data"),
         ]
-    
+    email = models.EmailField(_('email address'), blank=True, unique=True)
     phone=models.CharField('Сотовый',max_length=15,null=True,blank=True)
     fathername = models.CharField('Отчество', max_length=150, blank=True,null=True)
     gender_CHOICES = [
@@ -22,6 +23,8 @@ class appUser(AbstractUser):
     birth_date = models.DateField('Дата рождение',default= datetime.date.today,blank=True)
     card = models.CharField('Банковская карта',max_length=16,null=True,blank=True)
     position = models.CharField('Должность',max_length=20,null=True,blank=True)
+    school_name = models.CharField('Школа',max_length=20,null=True,blank=True,unique=True)
+    sub_domen = models.CharField('Домен',max_length=15,null=True,blank=True,unique=True)
     country = models.CharField('Страна',max_length=20,default="Kazakhstan",null=True)
     subdivison = models.CharField('Подразделение',max_length=20,null=True,blank=True)
     lead_activity = models.DateTimeField('Активность лида',default=timezone.now,null=True)
