@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import include,path
 from django.contrib.auth.views import LoginView, LogoutView
 from app import views
-
+from gografen import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls ,name='admin'),
@@ -27,20 +28,11 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     # path("auth/", include("authentication.urls")),
     path('api/v1/',include('app.routers')),
-    path('', views.home, name='home'),
-    path('contact/', views.contact, name='contact'),
-    path('about/', views.about, name='about'),
-    path('register/', views.register, name='register'),
-    path('login/',
-         LoginView.as_view
-         (
-             template_name='app/login.html',
-             extra_context=
-             {
-                 'title': 'Log in',
-                 'year' : datetime.now().year,
-             }
-         ),
-         name='login'),
-    path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
+    path('',include('app.urls')),
+    
+    
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    

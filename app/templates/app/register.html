@@ -10,19 +10,8 @@
                 {% csrf_token %}
                 <h4>Use a local account to register.</h4>
                 <hr />
-                {% comment %} <div class="form-group">
-                    {{ form.as_p}}
-                </div>
-                <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
-                </div>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
-                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                </div>
-                </div>
-                 {% endcomment %}
+                {{form.errors}}
+                {% comment %} {{form.as_p}} {% endcomment %}
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-8">
                         <div class="input-group input-group-sm mb-3">
@@ -38,11 +27,18 @@
                             </div>
                             <input type="text" class="form-control  " name="first_name" maxlength="30"  required="" id="id_first_name" placeholder="first name" aria-label="first name" aria-describedby="basic-addon4"> 
                         </div>
+                        
                         <div class="input-group input-group-sm mb-3">
                             <div class="input-group-prepend">
                                 <label class="input-group-text" for="id_last_name" id="basic-addon5">Фамилия:</label>
                             </div>
-                            <input type="text" class="form-control  " name="first_name" maxlength="30"  required="" id="id_last_name" placeholder="last name" aria-label="last name" aria-describedby="basic-addon5"> 
+                            <input type="text" class="form-control  " name="last_name" maxlength="30"  required="" id="id_last_name" placeholder="last name" aria-label="last name" aria-describedby="basic-addon5"> 
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="id_phone" id="basic-addon31">Сотовый телефон:</label>
+                            </div>
+                            <input type="phone" class="form-control  " name="phone" maxlength="30"  required="" id="id_phone" placeholder="" aria-label="phone" aria-describedby="basic-addon31"> 
                         </div>
                         <div class="input-group input-group-sm mb-3">
                             <div class="input-group-prepend">
@@ -54,16 +50,15 @@
                             <div class="input-group-prepend">
                                 <label class="input-group-text" for="id_school_name" id="basic-addon7">Название школы:</label>
                             </div>
-                            <input type="text" class="form-control  " name="text" maxlength="30"  required="" id="id_school_name" placeholder="school name" aria-label=" school name" aria-describedby="basic-addon7"> 
+                            <input type="text" class="form-control  " name="school_name" maxlength="30"  required="" id="id_school_name" placeholder="school name" aria-label=" school name" aria-describedby="basic-addon7"> 
                         </div>
                             <div class="input-group input-group-sm mb-3">
                         </div>
-                        
                         <div class="input-group input-group-sm mb-3">
                             <div class="input-group-prepend">
                                 <label class="input-group-text" id="id_sub_domen">Поддомен школы:</label>
                             </div>
-                            <input type="text" class="form-control" name="sub_domen" maxlength="15" required="" id="id_sub_domen" aria-describedby="basic-addon8" placeholder="example">
+                            <input type="text" class="form-control" name="sub_domen" maxlength="30" required="" id="id_sub_domen" aria-describedby="basic-addon8" placeholder="example">
                             <div class="input-group-append">
                                 <span class="input-group-text" for="basic-addon8">example.gografen.com</span>
                             </div>

@@ -3,6 +3,12 @@ from django.utils import timezone
 import datetime
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+import os
+
+def content_file_name(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s" % ('favicon.ico',)
+    return os.path.join('logo', filename)
 
 # Create your models here.
 class appUser(AbstractUser):
@@ -24,11 +30,13 @@ class appUser(AbstractUser):
     card = models.CharField('Банковская карта',max_length=16,null=True,blank=True)
     position = models.CharField('Должность',max_length=20,null=True,blank=True)
     school_name = models.CharField('Школа',max_length=20,null=True,blank=True,unique=True)
-    sub_domen = models.CharField('Домен',max_length=15,null=True,blank=True,unique=True)
+    sub_domen = models.CharField('Домен',max_length=30,null=True,blank=True,unique=True)
     country = models.CharField('Страна',max_length=20,default="Kazakhstan",null=True)
     subdivison = models.CharField('Подразделение',max_length=20,null=True,blank=True)
     lead_activity = models.DateTimeField('Активность лида',default=timezone.now,null=True)
-    client_activity = models.DateTimeField('Активность клиента',null=True)
+    client_activity = models.DateTimeField('Активность клиента',null=True,blank=True)
+    school_logo_1 = models.FileField('Лого 250x64',upload_to='logo',blank=True, null=True)
+    school_logo_2 = models.FileField('Лого 16x16',upload_to=content_file_name,blank=True, null=True)
     def __str__(self):
         return "%d | %s | %s %s" % (self.id,self.username, self.first_name, self.last_name)
 

@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ title }} - Gografen</title>
+    <link rel="icon" href="{{user.school_logo_2.url}}">
     {% load static %}
     {% comment %} <link rel="stylesheet" href="{% static 'app/content/bootstrap.min.css' %} " integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous" /> {% endcomment %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'app/content/style4.css' %}">
     {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" /> {% endcomment %}
     {% comment %} <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script> {% endcomment %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
 
@@ -22,17 +24,27 @@
         <nav id="sidebar">
             <div class="sidebar-header">
                 <h3>
-                    <img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+                {% if user.is_authenticated %}
+                    {% if user.school_logo_1 %}
+                        <img src="{{user.school_logo_1.url}}" width="200" height="auto" class="d-inline-block align-top" alt="">
+                    {% else %}
+                        
+                        {{user.school_name}}
+                    {% endif %}
+                {% else %}
+                    <img src="" width="30" height="30" class="d-inline-block align-top" alt="">
                     Gografen
+                {% endif%}
+                    
                 </h3>
                 <strong>GG</strong>
             </div>
+                        
 
             <ul class="list-unstyled components">
-                <li class="active">
+                {% comment %} <li class="active">
                     <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-home"></i>
-                        Home
+                        Главная
                     </a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         <li>
@@ -45,14 +57,9 @@
                             <a href="{% url 'home' %}">Home 3</a>
                         </li>
                     </ul>
-                </li>
-                <li>
-                    <a href="{% url 'about' %}">
-                        <i class="fas fa-briefcase"></i>
-                        About
-                    </a>
+                </li> {% endcomment %}
+                {% comment %} <li>
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-copy"></i>
                         Pages
                     </a>
                     <ul class="collapse list-unstyled" id="pageSubmenu">
@@ -66,23 +73,56 @@
                             <a href="#">Page 3</a>
                         </li>
                     </ul>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-image"></i>
-                        Portfolio
+                </li> {% endcomment %}
+                <li class="active">
+                    <a href="{% url 'home' %}">
+                        Главная
                     </a>
                 </li>
                 <li>
                     <a href="#">
-                        <i class="fas fa-question"></i>
-                        FAQ
+                        Каталог
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Пользователи
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Учебные курсы
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Задание
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Отчеты
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'settings' %}">
+                        Настройки
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="{% url 'about' %}">
+                        О нас
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'contact' %}">
-                        <i class="fas fa-paper-plane"></i>
-                        Contact
+                        Контакты
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Вопросы и Ответы
                     </a>
                 </li>
             </ul>
@@ -134,11 +174,12 @@
 
                             {% else %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'register' %}">Register</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'login' %}">Log in</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register' %}">Register</a>
+                            </li>
+                            
                             {% endif %}
                             
                             {% comment %} <li class="nav-item">
