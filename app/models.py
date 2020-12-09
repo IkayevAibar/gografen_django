@@ -4,6 +4,11 @@ import datetime
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 import os
+from django.core.cache import cache 
+from gografen import settings
+from django.contrib.auth.models import Group
+
+Group.add_to_class('description', models.CharField(max_length=180,null=True, blank=True))
 
 def content_file_name(instance, filename):
     ext = filename.split('.')[-1]
@@ -12,11 +17,22 @@ def content_file_name(instance, filename):
 
 # Create your models here.
 class appUser(AbstractUser):
-    class Meta:
-        permissions = [
-            ("can_add_comment","Can add comments"),
-            ("can_edit_user_data","Can edit user data"),
-        ]
+    def has_group(user, group_name):
+        return user.groups.filter(name=group_name).exists() 
+    def last_seen(self):
+        return cache.get('seen_%s' % self.username)
+    def online(self):
+        if self.last_seen():
+            now = datetime.datetime.now()
+            if now > self.last_seen() + datetime.timedelta(
+                        seconds=settings.USER_ONLINE_TIMEOUT):
+                return False
+            else:
+                return True
+        else:
+            return False
+    
+    
     email = models.EmailField(_('email address'), blank=True, unique=True)
     phone=models.CharField('Сотовый',max_length=15,null=True,blank=True)
     fathername = models.CharField('Отчество', max_length=150, blank=True,null=True)
@@ -37,22 +53,41 @@ class appUser(AbstractUser):
     client_activity = models.DateTimeField('Активность клиента',null=True,blank=True)
     school_logo_1 = models.FileField('Лого 250x64',upload_to='logo',blank=True, null=True)
     school_logo_2 = models.FileField('Лого 16x16',upload_to=content_file_name,blank=True, null=True)
+    is_online = models.BooleanField(default=False)
     def __str__(self):
-        return "%d | %s | %s %s" % (self.id,self.username, self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 
 class Course(models.Model):
     title = models.CharField('Название',max_length=20)
     cost = models.IntegerField('Стоимость',default=0,help_text='в тенге')
-    poster = models.TextField('Постер',max_length=1000)
-    short_desc = models.TextField('Короткое описание',max_length=200)
-    full_desc = models.TextField('Полное описание',max_length=500)
+    poster = models.TextField('Постер',max_length=1000,blank=True, null=True)
+    mini_poster = models.TextField('Постер',max_length=1000,blank=True, null=True)
+    short_desc = models.TextField('Короткое описание',max_length=200,blank=True, null=True)
+    full_desc = models.TextField('Полное описание',max_length=500,blank=True, null=True)
     start_date = models.DateField('Начало даты',default= datetime.date.today)
-    end_date = models.DateField('Конец даты')
-    course_programm = models.CharField('Программа курса',max_length=30)
-    duration = models.IntegerField('Длителность',default=0,help_text='в минутах')
-    pub_date = models.DateTimeField('Дата публикации')
+    lesson_count = models.IntegerField('Количество уроков',default=0,blank=True, null=True)
+    end_date = models.DateField('Конец даты',blank=True, null=True)
+    duration = models.IntegerField('Длителность',default=0,help_text='в минутах',blank=True, null=True)
+    pub_date = models.DateTimeField('Дата публикации',default= datetime.date.today)
     creator_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='Создатель курса')
+    def update_num_lessons(self):
+        self.lesson_count=Lesson.objects.filter(course_id=self).count()
+        return self.save(update_fields=["lesson_count"])
     def __str__(self):
         return "%s Price:%s tg" % (self.title, self.cost)
+
+class Lesson(models.Model):
+    
+    title = models.CharField('Название',max_length=20)
+    short_desc = models.TextField('Короткое описание',max_length=200,blank=True, null=True)
+    full_desc = models.TextField('Полное описание',max_length=500,blank=True, null=True)
+    duration = models.IntegerField('Длителность',default=0,help_text='в минутах',blank=True, null=True)
+    files = models.FileField('Содержание урока',upload_to='lessons',blank=True, null=True)
+    pub_date = models.DateField('Дата публикации',default= datetime.date.today)
+    course_id = models.ForeignKey('Course',on_delete=models.SET_NULL,blank=True,null=True,help_text='курс')
+    teacher_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='Учитель курса')
+    def __str__(self):
+        return "%s" % (self.title)
+
 

@@ -44,16 +44,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'subdomains'
 ]
+SITE_ID = 2
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'subdomains.middleware.SubdomainURLRoutingMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+]
+MIDDLEWARE_CLASSES = [
+    'app.appUser.middleware.ActiveUserMiddleware',
 ]
 
 ROOT_URLCONF = 'gografen.urls'
@@ -134,6 +142,7 @@ STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
 MEDIA_URL = '/media/'
 MEDIA_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['media']))
 
+FIXTURE_DIRS = 'fixtures'
 
 AUTH_USER_MODEL = 'app.appUser'
 
@@ -148,7 +157,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
 }
-
 # REST_FRAMEWORK = {
 # 'DEFAULT_PERMISSION_CLASSES': (
 # 'rest_framework.permissions.IsAuthenticated',
@@ -204,4 +212,28 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:4200",
     "http://localhost:1313",
     "http://localhost:4200",
+    "*",
 ]
+
+CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',              
+        }
+    }
+
+# Number of seconds of inactivity before a user is marked offline
+USER_ONLINE_TIMEOUT = 300
+
+# Number of seconds that we will keep track of inactive users for before 
+# their last seen is removed from the cache
+USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
+
+LOGIN_URL = 'login'
+
+
+SUBDOMAIN_URLCONFS = {
+    None : 'landing.urls',  # no subdomain, e.g. ``example.com``
+    '*' : 'app.urls',
+    'api': 'gografen.urls',
+}

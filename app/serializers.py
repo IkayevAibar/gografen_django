@@ -19,7 +19,7 @@ class CreateappUserSerializer(serializers.ModelSerializer):
     #Getting User info
     class Meta:
         model = appUser
-        exclude = ("client_activity","lead_activity","last_login","is_active","is_staff","is_superuser","groups","user_permissions","school_name","sub_domen","school_logo_1","school_logo_2")
+        exclude = ("client_activity","lead_activity","last_login","is_active","is_staff","is_superuser","groups","user_permissions","school_name","sub_domen","school_logo_1","school_logo_2","is_online")
     def create(self, validated_data):
         user = super(CreateappUserSerializer, self).create(validated_data)
         user.set_password(validated_data['password'])

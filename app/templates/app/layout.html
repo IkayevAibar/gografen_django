@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html>
+{% comment %} {% extends "app/head.html" %} {% endcomment %}
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{ title }} - Gografen</title>
-    <link rel="icon" href="{{user.school_logo_2.url}}">
+    {% if user.is_authenticated %}
+        <title>{{ title }} - {{user.school_name}}</title>
+    {% else %}
+        <title>{{ title }} - Gografen</title>
+    {% endif %}
+    {% if user.is_authenticated %}
+        {% if user.school_logo_2%}
+            <link rel="icon" href="{{user.school_logo_2.url}}">
+        {% endif%}
+    {% endif %}
+    
     {% load static %}
     {% comment %} <link rel="stylesheet" href="{% static 'app/content/bootstrap.min.css' %} " integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous" /> {% endcomment %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
@@ -28,77 +38,62 @@
                     {% if user.school_logo_1 %}
                         <img src="{{user.school_logo_1.url}}" width="200" height="auto" class="d-inline-block align-top" alt="">
                     {% else %}
-                        
                         {{user.school_name}}
                     {% endif %}
                 {% else %}
-                    <img src="" width="30" height="30" class="d-inline-block align-top" alt="">
                     Gografen
                 {% endif%}
                     
                 </h3>
                 <strong>GG</strong>
             </div>
-                        
-
             <ul class="list-unstyled components">
-                {% comment %} <li class="active">
-                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        Главная
-                    </a>
-                    <ul class="collapse list-unstyled" id="homeSubmenu">
-                        <li>
-                            <a href="{% url 'home' %}">Home 1</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'home' %}">Home 2</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'home' %}">Home 3</a>
-                        </li>
-                    </ul>
-                </li> {% endcomment %}
-                {% comment %} <li>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        Pages
-                    </a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
-                        <li>
-                            <a href="#">Page 1</a>
-                        </li>
-                        <li>
-                            <a href="#">Page 2</a>
-                        </li>
-                        <li>
-                            <a href="#">Page 3</a>
-                        </li>
-                    </ul>
-                </li> {% endcomment %}
                 <li class="active">
                     <a href="{% url 'home' %}">
                         Главная
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="{% url 'catalog' %}">
                         Каталог
                     </a>
                 </li>
+                {% if user.groups.all.0.name != 'Student' and user.is_authenticated %}
                 <li>
-                    <a href="#">
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         Пользователи
                     </a>
-                </li>
+                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                        <li>
+                            <a href="{% url 'users' %}">Пользователи</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'roles' %}">Роли</a>
+                        </li>
+                    </ul>
+                </li> 
+                {% endif %}
                 <li>
-                    <a href="#">
+                    <a href="{% url 'courses' %}">
                         Учебные курсы
                     </a>
                 </li>
                 <li>
                     <a href="#">
-                        Задание
+                        Задания
                     </a>
                 </li>
+                <li>
+                    <a href="#">
+                        База Знаний
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Комментарии
+                    </a>
+                </li>
+                {% if user.groups.all.0.name != 'Student' and user.is_authenticated %}
                 <li>
                     <a href="#">
                         Отчеты
@@ -109,8 +104,7 @@
                         Настройки
                     </a>
                 </li>
-                
-                <li>
+                {% comment %} <li>
                     <a href="{% url 'about' %}">
                         О нас
                     </a>
@@ -124,23 +118,23 @@
                     <a href="#">
                         Вопросы и Ответы
                     </a>
-                </li>
+                </li> {% endcomment %}
+                {% endif %}
             </ul>
-
             <ul class="list-unstyled CTAs">
                 <footer>
-                    &copy; {{ year }} - Gografen
+                    {% if user.is_authenticated %}
+                        &copy; {{ year }} -  {{user.school_name}}
+                    {% else %}
+                        &copy; {{ year }} - Gografen
+                    {% endif %}
                 </footer>
-                
             </ul>
         </nav>
-
         <!-- Page Content  -->
         <div id="content">
-
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container-fluid">
-
                     <button type="button" id="sidebarCollapse" class="btn btn-info">
                         <i class="fas fa-align-left"></i>
                         <span>Скрыть</span>
@@ -148,7 +142,6 @@
                     <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <i class="fas fa-align-justify"></i>
                     </button>
-
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav ml-auto">
                             {% comment %} <li class="nav-item active">
@@ -163,7 +156,7 @@
                             {% endif %}
                             {% if user.is_authenticated %}
                             <li class="nav-item">
-                                <span class="navbar-brand">Hello, {{ user.first_name  }} {{user.last_name}}</span>
+                                <span class="navbar-brand">{{ user.first_name  }} {{user.last_name}}</span>
                             </li>
                             <form id="logoutForm" action="/logout/" method="post" class="navbar-right">
                                 {% csrf_token %}
@@ -171,31 +164,12 @@
                                     <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
                                 </li>
                             </form>
-
-                            {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">Log in</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'register' %}">Register</a>
-                            </li>
-                            
                             {% endif %}
-                            
-                            {% comment %} <li class="nav-item">
-                                <a class="nav-link" href="#">Page</a>
-                            </li> {% endcomment %}
                         </ul>
                     </div>
                 </div>
             </nav>
             {% block content %}{% endblock %}
-            
-            {% comment %} 
-            <div class="line"></div> 
-            {% endcomment %}
-
-            
         </div>
     </div>
 
@@ -219,7 +193,54 @@
             });
         });
     </script>
-    {% comment %} <div class="navbar navbar-inverse navbar-fixed-top">
+ 
+        
+
+    <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
+    <script src="{% static 'app/scripts/bootstrap.js' %}"></script>
+    <script src="{% static 'app/scripts/respond.js' %}"></script>
+{% block scripts %}{% endblock %}
+
+</body>
+</html>
+
+
+ {% comment %} <li class="active">
+                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        Главная
+                    </a>
+                    <ul class="collapse list-unstyled" id="homeSubmenu">
+                        <li>
+                            <a href="{% url 'home' %}">Home 1</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'home' %}">Home 2</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'home' %}">Home 3</a>
+                        </li>
+                    </ul>
+                </li> {% endcomment %}
+                {% comment %} 
+                <li>
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        Pages
+                    </a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                        <li>
+                            <a href="#">Page 1</a>
+                        </li>
+                        <li>
+                            <a href="#">Page 2</a>
+                        </li>
+                        <li>
+                            <a href="#">Page 3</a>
+                        </li>
+                    </ul>
+                </li> 
+                {% endcomment %}
+
+                   {% comment %} <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -266,13 +287,3 @@
         </div>
     </div> {% endcomment %}
 
-
-        
-
-    <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
-    <script src="{% static 'app/scripts/bootstrap.js' %}"></script>
-    <script src="{% static 'app/scripts/respond.js' %}"></script>
-{% block scripts %}{% endblock %}
-
-</body>
-</html>

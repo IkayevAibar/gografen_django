@@ -1,0 +1,77 @@
+{% extends "app/layout.html" %}
+{% with a=0 %}
+{% endwith %}
+{% block content %}
+<h2>{{ title }}</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section id="addroleForm">
+            <form action="." method="post" class="form-horizontal">
+                {% csrf_token %}
+                <hr />
+                {% comment %} {{form.as_p}} {% endcomment %}
+                {{form.errors}}
+                
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-8">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="id_name" id="basic-addon4">Роль:</label>
+                            </div>
+                            <input type="text" class="form-control  " name="name" maxlength="150"  required="" id="id_name"  aria-label="first name" aria-describedby="basic-addon4"> 
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="id_description" id="basic-addon5">Описание:</label>
+                            </div>
+                            <input type="text"  class="form-control  " name="description" maxlength="180"  required="" id="id_description"  aria-label="id_description" aria-describedby="basic-addon5"> 
+                        </div>
+                    </div>
+
+                    <div class="col-md-offset-2 col-md-12">
+                    {% comment %} {{list}} {% endcomment %}
+                    
+                            {% for pr,pe in list.items %}
+                                {% comment %} {{pe}} {% endcomment %}
+                                    <div class=" col-sm-6 ">
+                                        {{pe.content_type}}
+                                        <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">
+                                            <input type="checkbox" name="permissions" id="id_permissions_{{pr}}" value="{{pe.id}}" aria-label="Checkbox for following text input">
+                                            </div>
+                                        </div>
+                                        <input type="text" class="form-control" disabled aria-label="Text input with checkbox" value="{{pe.name}}">
+                                        </div>
+                                    </div>
+                            {% endfor %}
+                </div>
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="hidden" name="next" value="/" />
+                        <input type="submit" name="submit" value="Добавить роль" class="btn-save btn btn-primary" />
+                    </div>
+                </div>
+            </form>
+        
+        </section>
+    </div>
+    <div class="col-md-4">
+        <section id="socialLoginForm"></section>
+    </div>
+</div>
+
+{% endblock %}
+
+<script>
+$(document).ready(function() {
+$('.mdb-select').materialSelect();
+});
+</script>
+{% block scripts %}
+
+    {% load static %}
+<script src="{% static 'app/scripts/jquery.validate.min.js' %}"></script>
+
+{% endblock %}

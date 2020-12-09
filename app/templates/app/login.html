@@ -1,51 +1,81 @@
-{% extends "app/layout.html" %}
+{% comment %} {% extends "app/layout.html" %} {% endcomment %}
 
-{% block content %}
+{% comment %} {% block content %} {% endcomment %}
 
-<h2>{{ title }}</h2>
-<div class="row">
-    <div class="col-md-8">
-        <section id="loginForm">
-            <form action="." method="post" class="form-horizontal">
-                {% csrf_token %}
-                <h4>Use a local account to log in.</h4>
-                <hr />
-                <div class="form-group">
-                    <label for="id_username" class="col-md-2 control-label">User name</label>
-                    <div class="col-md-10">
-                        {{ form.username }}
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  </head>
+  <body>
+  {% comment %} {% load subdomainurls %} {% endcomment %}
+  {% comment %} {% url 'main' %} {% endcomment %}
+  {% comment %} {% url 'api/v1/swagger' subdomain='api' %} {% endcomment %}
+  <div class="container">
+      <h2>{{ title }}</h2>
+      <div class="row">
+        <div class="col-md-8">
+            <section id="loginForm">
+                <form action="." method="post" class="form-horizontal">
+                    {% csrf_token %}
+                    <h4>Use a account that given by your main teacher.</h4>
+                    <hr />
+                    <div class="form-group">
+                        <label for="id_username" class="col-md-2 control-label">User name</label>
+                        <div class="col-md-10">
+                            {{ form.username }}
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="id_password" class="col-md-2 control-label">Password</label>
-                    <div class="col-md-10">
-                        {{ form.password }}
+                    <div class="form-group">
+                        <label for="id_password" class="col-md-2 control-label">Password</label>
+                        <div class="col-md-10">
+                            {{ form.password }}
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="hidden" name="next" value="/" />
-                        <input type="submit" value="Log in" class="btn btn-default" />
+                    <div class="form-group row">
+                        <div class="col-md-offset-3 col-md-2">
+                            <input type="hidden" name="next" value="/" />
+                            <input type="submit" value="Log in" class="btn btn-warning " />
+                        </div>
+                        <div class="col-md-4">
+                            <section id="socialLoginForm">
+                                <a href="{% url 'register' %}" class="btn btn-info"> go to Register</a>
+                            </section>
+                        </div>
                     </div>
-                </div>
-                {% if form.errors %}
-                <p class="validation-summary-errors">Please enter a correct user name and password.</p>
-                {% endif %}
-                <h5>or you can register <a href="{% url 'register' %}">here</a></h5>
-            </form>
-        </section>
+                    
+                    {% if form.errors %}
+                    <p class="validation-summary-errors">Please enter a correct user name and password.</p>
+                    {% endif %}
+                </form>
+
+            </section>
+        </div>
+        
     </div>
-    <div class="col-md-4">
-        <section id="socialLoginForm"></section>
-    </div>
-</div>
+  </div>
 
-{% endblock %}
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
+
+{% comment %} {% endblock %} {% endcomment %}
 
 
 {% block scripts %}
 
-    {% load static %}
+{% load static %}
 <script src="{% static 'app/scripts/jquery.validate.min.js' %}"></script>
 
 {% endblock %}

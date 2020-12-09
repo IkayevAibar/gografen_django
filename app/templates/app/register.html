@@ -1,104 +1,131 @@
-{% extends "app/layout.html" %}
+{% comment %} {% extends "app/layout.html" %} {% endcomment %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  </head>
+  <body>
+  <div class="container">
+
+      <h2>{{ title }}</h2>
+        <div class="row">
+            <div class="col-md-8">
+                <section id="registerForm">
+                    <form action="." method="post" class="form-horizontal">
+                        {% csrf_token %}
+                        <h4>Use a local account to register.</h4>
+                        <hr />
+                        {{form.errors}}
+                        {% comment %} {{form.as_p}} {% endcomment %}
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-8">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_username" id="basic-addon1">Имя пользователя:</label> 
+                                    </div>
+                                    <input type="text" class="form-control" name="username" maxlength="150" autofocus="" placeholder="username" aria-label="Username" required="" id="id_username" aria-describedby="basic-addon1">
+                                    <span class="helptext form-text text-muted">Обязательное поле. Не более 150 символов. Только буквы, цифры и символы @/./+/-/_.</span>
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_first_name" id="basic-addon4">Имя:</label>
+                                    </div>
+                                    <input type="text" class="form-control  " name="first_name" maxlength="30"  required="" id="id_first_name" placeholder="first name" aria-label="first name" aria-describedby="basic-addon4"> 
+                                </div>
+                                
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_last_name" id="basic-addon5">Фамилия:</label>
+                                    </div>
+                                    <input type="text" class="form-control  " name="last_name" maxlength="30"  required="" id="id_last_name" placeholder="last name" aria-label="last name" aria-describedby="basic-addon5"> 
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_phone" id="basic-addon31">Сотовый телефон:</label>
+                                    </div>
+                                    <input type="phone" class="form-control  " name="phone" maxlength="30"  required="" id="id_phone" placeholder="" aria-label="phone" aria-describedby="basic-addon31"> 
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_email" id="basic-addon6">Почта:</label>
+                                    </div>
+                                    <input type="email" class="form-control  " name="email" maxlength="30"  required="" id="id_email" placeholder="name@example.com" aria-label=" email" aria-describedby="basic-addon6"> 
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_school_name" id="basic-addon7">Название школы:</label>
+                                    </div>
+                                    <input type="text" class="form-control  " name="school_name" maxlength="30"  required="" id="id_school_name" placeholder="school name" aria-label=" school name" aria-describedby="basic-addon7"> 
+                                </div>
+                                    <div class="input-group input-group-sm mb-3">
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" id="id_sub_domen">Поддомен школы:</label>
+                                    </div>
+                                    <input type="text" class="form-control" name="sub_domen" maxlength="30" required="" id="id_sub_domen" aria-describedby="basic-addon8" placeholder="example">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" for="basic-addon8">example.gografen.com</span>
+                                    </div>
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_password1" id="basic-addon2">Пароль:</label> 
+                                    </div>
+                                    <input type="password" class="form-control" name="password1" maxlength="150" autocomplete="new-password" required="" id="id_password1" placeholder="password" aria-label="password" aria-describedby="basic-addon2"> 
+                                    <span class="helptext form-text text-muted" class="helptext"></span>
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_password2" id="basic-addon3">Подтверждение пароля:</label>
+                                    </div>
+                                    <input type="password" class="form-control  " name="password2" maxlength="150" autocomplete="new-password" required="" id="id_password2" placeholder="confirm password" aria-label="password" aria-describedby="basic-addon3"> 
+                                    <span class="helptext form-text text-muted w-100" class="helptext">Для подтверждения введите, пожалуйста, пароль ещё раз.</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <ul><li>Your password can’t be too similar to your other personal information.</li><li>Ваш пароль должен содержать как минимум 8 символов.</li><li>Your password can’t be a commonly used password.</li><li>Your password can’t be entirely numeric.</li></ul><p></p>
+                            </div>
+
+                        </div>
+                        <hr />
+                        <div class="form-group row">
+                            <div class="col-md-offset-2 col-md-2">
+                                <input type="hidden" name="next" value="/" />
+                                <input type="submit" name="submit" value="Sign up" class="btn btn-warning" />
+                            </div>
+                            <div class="col-md-4">
+                                <section id="socialLoginForm">
+                                    <a href="{% url 'login' %}" class="btn btn-info">go to Login</a>
+                                </section>
+                            </div>
+                        </div>
+                    </form>
+                
+                </section>
+            </div>
+            <div class="col-md-4">
+                <section id="socialLoginForm"></section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
 {% block content %}
 
-<h2>{{ title }}</h2>
-<div class="row">
-    <div class="col-md-8">
-        <section id="registerForm">
-            <form action="." method="post" class="form-horizontal">
-                {% csrf_token %}
-                <h4>Use a local account to register.</h4>
-                <hr />
-                {{form.errors}}
-                {% comment %} {{form.as_p}} {% endcomment %}
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-8">
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_username" id="basic-addon1">Имя пользователя:</label> 
-                            </div>
-                            <input type="text" class="form-control" name="username" maxlength="150" autofocus="" placeholder="username" aria-label="Username" required="" id="id_username" aria-describedby="basic-addon1">
-                            <span class="helptext form-text text-muted">Обязательное поле. Не более 150 символов. Только буквы, цифры и символы @/./+/-/_.</span>
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_first_name" id="basic-addon4">Имя:</label>
-                            </div>
-                            <input type="text" class="form-control  " name="first_name" maxlength="30"  required="" id="id_first_name" placeholder="first name" aria-label="first name" aria-describedby="basic-addon4"> 
-                        </div>
-                        
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_last_name" id="basic-addon5">Фамилия:</label>
-                            </div>
-                            <input type="text" class="form-control  " name="last_name" maxlength="30"  required="" id="id_last_name" placeholder="last name" aria-label="last name" aria-describedby="basic-addon5"> 
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_phone" id="basic-addon31">Сотовый телефон:</label>
-                            </div>
-                            <input type="phone" class="form-control  " name="phone" maxlength="30"  required="" id="id_phone" placeholder="" aria-label="phone" aria-describedby="basic-addon31"> 
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_email" id="basic-addon6">Почта:</label>
-                            </div>
-                            <input type="email" class="form-control  " name="email" maxlength="30"  required="" id="id_email" placeholder="name@example.com" aria-label=" email" aria-describedby="basic-addon6"> 
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_school_name" id="basic-addon7">Название школы:</label>
-                            </div>
-                            <input type="text" class="form-control  " name="school_name" maxlength="30"  required="" id="id_school_name" placeholder="school name" aria-label=" school name" aria-describedby="basic-addon7"> 
-                        </div>
-                            <div class="input-group input-group-sm mb-3">
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" id="id_sub_domen">Поддомен школы:</label>
-                            </div>
-                            <input type="text" class="form-control" name="sub_domen" maxlength="30" required="" id="id_sub_domen" aria-describedby="basic-addon8" placeholder="example">
-                            <div class="input-group-append">
-                                <span class="input-group-text" for="basic-addon8">example.gografen.com</span>
-                            </div>
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_password1" id="basic-addon2">Пароль:</label> 
-                            </div>
-                            <input type="password" class="form-control" name="password1" maxlength="150" autocomplete="new-password" required="" id="id_password1" placeholder="password" aria-label="password" aria-describedby="basic-addon2"> 
-                            <span class="helptext form-text text-muted" class="helptext"></span>
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_password2" id="basic-addon3">Подтверждение пароля:</label>
-                            </div>
-                            <input type="password" class="form-control  " name="password2" maxlength="150" autocomplete="new-password" required="" id="id_password2" placeholder="confirm password" aria-label="password" aria-describedby="basic-addon3"> 
-                            <span class="helptext form-text text-muted w-100" class="helptext">Для подтверждения введите, пожалуйста, пароль ещё раз.</span>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-8">
-                        <ul><li>Your password can’t be too similar to your other personal information.</li><li>Ваш пароль должен содержать как минимум 8 символов.</li><li>Your password can’t be a commonly used password.</li><li>Your password can’t be entirely numeric.</li></ul><p></p>
-                    </div>
-
-                </div>
-                <hr />
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="hidden" name="next" value="/" />
-                        <input type="submit" name="submit" value="Sign up" class="btn btn-default" />
-                    </div>
-                </div>
-            </form>
-        
-        </section>
-    </div>
-    <div class="col-md-4">
-        <section id="socialLoginForm"></section>
-    </div>
-</div>
 
 {% endblock %}
 
