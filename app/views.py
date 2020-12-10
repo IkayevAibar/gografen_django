@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.shortcuts import render,redirect
-from django.http import HttpRequest,HttpResponse
+from django.http import HttpRequest,HttpResponse,HttpResponseRedirect
 from .serializers import GetappUserSerializer,GetappUserPublicSerializer,CreateappUserSerializer
 # from rest_framework.generics import RetrieveAPIView,UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
@@ -31,6 +31,23 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver    
 from django.template import Context
 from django.contrib.sites.models import Site
+from django.urls import reverse
+
+def mainpage(request):
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain == "localhost:8000"):
+        return render(
+                request,
+                    'app/main.html',
+                    {
+                        'title':'Landing Page',
+                        'year':datetime.now().year,
+                    }
+                )
+    else:
+        return redirect('home')
+
+
 @receiver(user_logged_in)
 def got_online(sender, user, request, **kwargs):    
     user.is_online = True
@@ -48,7 +65,6 @@ def validate_gografen(value):
             raise ValidationError("This field should have gogafen.com")
 
 class UserActivationView(APIView):
-
         def get (self, request):
             urlpathrelative=request.get_full_path()
             ABSOLUTE_ROOT= request.build_absolute_uri('/')[:-1].strip("/")
@@ -93,31 +109,14 @@ class appUserCreateView(ModelViewSet):
 @login_required
 def home(request):
     """Renders the home page."""
-    try:
-        # Retrieve the user account associated with the current subdomain.
-        if(request.subdomain):
-            subd = "http://" + request.subdomain + ".gografen.com" 
-            # print(subd)
-            # print(request.user.sub_domen)
-            if(request.user.sub_domen == subd):
-                assert isinstance(request, HttpRequest)
-                return render(
-                    request,
-                    'app/index.html',
-                    {
-                        'title':'Home Page',
-                        'year':datetime.now().year,
-                    }
-                )
-            else:
-                raise Http404
-            # user = appUser.objects.get(sub_domen=subd)
-        else:
-            raise Http404
-        
-    except appUser.DoesNotExist:
-        # No user matches the current subdomain, so return a generic 404.
-        raise Http404
+    return render(
+        request,
+        'app/index.html',
+        {
+            'title':'Home Page',
+            'year':datetime.now().year,
+        }
+    )
 
 
 class appUserSettingsChangeForm(forms.ModelForm):
@@ -163,26 +162,38 @@ class appUserAddingForm(UserCreationForm):
  
 
 def register(request):
-    if request.method == 'POST':
-        f = appUserCreationForm(request.POST)
-        try:
-            send_mail('Test', 'Message', 'gografen@test.com', user.email)
-        except Exception:
-            pass
-        
-        if f.is_valid():
-            user=f.save()
-            group_role = Group.objects.get(name='MainTeacher')
-            user.groups.add(group_role)
-            # username = f.cleaned_data.get('username')
-            # raw_password = f.cleaned_data.get('password1')
-            # user = authenticate(username=username, password=raw_password)
-            # login(request, user)
-            return redirect('login')
-    else:
-        f = appUserCreationForm()
+    new_url = "http://localhost:8000"
+    sub_domain = request.get_host().split('.')[0]
+    if(request.get_host().split('.')[0] == 'localhost:8000'):
+        if request.method == 'POST':
+            f = appUserCreationForm(request.POST)
+            try:
+                send_mail('Test', 'Message', 'gografen@test.com', user.email)
+            except Exception:
+                pass
+            
+            if f.is_valid():
+                user=f.save()
+                group_role = Group.objects.get(name='MainTeacher')
+                user.groups.add(group_role)
+                new_url = user.sub_domen.split('.')[0] + ".localhost:8000"
+                return HttpResponseRedirect(new_url)
+            else:
+                return render(request, 'app/register.html', {
+                    'form': f,
+                    'sub':sub_domain
+                })
+        else:
+            f = appUserCreationForm()
 
-    return render(request, 'app/register.html', {'form': f})
+        return render(request, 'app/register.html', {
+            'form': f,
+            'sub':sub_domain
+        })
+    else:
+        return redirect('login')
+
+    
 
 # @user_passes_test(lambda u: u.has_perm('app.add_appuser'),redirect_field_name='home')
 @permission_required('app.add_appuser')
@@ -230,9 +241,10 @@ def users(request):
     users = appUser.objects.all()
     valid_users=[]  
     for user in users:
-        if(user.has_group('Student') or user.has_group('MainTeacher') or user.has_group('Teacher')):
-            valid_users.append(user)
-    
+        if(user.sub_domen == request.user.sub_domen):
+            if(user.has_group('Student') or user.has_group('MainTeacher') or user.has_group('Teacher')):
+                    valid_users.append(user)
+        
     assert isinstance(request, HttpRequest)
     return render(
         request,
@@ -245,6 +257,8 @@ def users(request):
         }
     )
 
+    
+
 @permission_required('app.add_appuser')
 def addrole(request):
     g = Group.objects.all()
@@ -255,13 +269,13 @@ def addrole(request):
     for pp in p:
         count[counter]=pp
         counter+=1
-
     if request.method == 'POST':
         form = GroupCreationForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('roles')
         else:
+            assert isinstance(request, HttpRequest)
             return render(
                 request,
                 'app/addrole.html',
@@ -285,9 +299,7 @@ def addrole(request):
             'title':'Adding Role',
             'message':'Your application description page.',
             'year':datetime.now().year,
-            'groups':g,
             'form':form,
-
         }
     )
 
@@ -300,12 +312,13 @@ def roles(request):
         request,
         'app/roles.html',
         {
-            'title':'Users',
+            'title':'Roles',
             'message':'Your application description page.',
             'year':datetime.now().year,
             'groups':g
         }
     )
+    
 
 
 @login_required(login_url='/login/')
@@ -318,19 +331,19 @@ def settings(request):
             f.save()
             return redirect('home')
         else:
+            assert isinstance(request, HttpRequest)
             return render(
-            request,
-            'app/settings.html',
-            {
-                'title':'settings',
-                'message':'Your settings page.',
-                'year':datetime.now().year,
-                'sch_name': s[0].school_name,
-                'sch_domen': s[0].sub_domen,
-                'f':f
-                
-            }
-    )
+                request,
+                'app/settings.html',
+                {
+                    'title':'settings',
+                    'message':'Your settings page.',
+                    'year':datetime.now().year,
+                    'sch_name': s[0].school_name,
+                    'sch_domen': s[0].sub_domen,
+                    'f':f
+                }
+            )
     else:
         f = appUserSettingsChangeForm()
     assert isinstance(request, HttpRequest)

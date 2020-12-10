@@ -45,26 +45,28 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'subdomains'
+    'django_hosts'
 ]
 SITE_ID = 2
 
 MIDDLEWARE = [
+    'django_hosts.middleware.HostsRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'subdomains.middleware.SubdomainURLRoutingMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
+    'django_hosts.middleware.HostsResponseMiddleware',
 ]
 MIDDLEWARE_CLASSES = [
-    'app.appUser.middleware.ActiveUserMiddleware',
 ]
 
 ROOT_URLCONF = 'gografen.urls'
+ROOT_HOSTCONF = 'gografen.hosts'
+DEFAULT_HOST = 'app'
+DEFAULT_REDIRECT_URL = "http://localhost:8000"
 
 TEMPLATES = [
     {
@@ -233,7 +235,7 @@ LOGIN_URL = 'login'
 
 
 SUBDOMAIN_URLCONFS = {
-    None : 'landing.urls',  # no subdomain, e.g. ``example.com``
+    None : 'app.urls',  # no subdomain, e.g. ``example.com``
     '*' : 'app.urls',
     'api': 'gografen.urls',
 }

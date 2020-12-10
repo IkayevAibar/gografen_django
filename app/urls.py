@@ -8,7 +8,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     # path('auth/users/activate/(?P<uid>[\w-]+)/(?P<token>[\w-]+)/$', UserActivationView.as_view()),
-    path('', views.home, name='home'),
+    path('', views.mainpage, name='main'),
+    path('home', views.home, name='home'),
     path('admin/', admin.site.urls ,name='admin'),
     path('contact/', views.contact, name='contact'),
     path('about/', views.about, name='about'),

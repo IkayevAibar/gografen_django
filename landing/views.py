@@ -9,7 +9,7 @@ def mainpage(request):
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'landing/index.html',
+        'landing/main.html',
         {
             'title':'Home Page',
             'year':datetime.now().year,

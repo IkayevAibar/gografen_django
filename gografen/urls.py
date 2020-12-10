@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import include,path
 from django.contrib.auth.views import LoginView, LogoutView
 from app import views
+from gografen import views
 from gografen import settings
 from django.conf.urls.static import static
 
@@ -28,9 +29,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     # path("auth/", include("authentication.urls")),
     path('api/v1/',include('app.routers')),
-    path('',include('app.urls')),
-    
-    
+    path('',views.wildcard_redirect),
 ]
 
 if settings.DEBUG:
