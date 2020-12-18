@@ -7,30 +7,29 @@
         <section id="registerForm">
             <form enctype="multipart/form-data" action="." method="post" class="form-horizontal">
                 {% csrf_token %}
-                
+                {% comment %} {{f.as_p}} {% endcomment %}
                 {{ f.non_field_errors }}
                 {{f.errors}}
-                {% comment %} {{f.as_p}} {% endcomment %}
                 <h4>Основные настройки.</h4>
                 <hr />
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="id_school_name" id="basic-addon1">Название Учебного центра:</label> 
                     </div>
-                    <input type="text" class="form-control" value="{{sch_name}}" name="school_name" maxlength="150" autofocus="" placeholder="Название" aria-label="название" required="" id="id_school_name" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" value="{{school.school_name}}" name="school_name" maxlength="150" autofocus="" placeholder="Название" aria-label="название" required="" id="id_school_name" aria-describedby="basic-addon1">
                 </div>
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <label class="input-group-text" id="id_sub_domen">URL(поддомен) Учебного центра:</label>
                     </div>
-                    <input type="text" class="form-control" value={{sch_domen}} name="sub_domen" maxlength="30" required="" id="id_sub_domen" aria-describedby="basic-addon8" placeholder="example">
+                    <input type="text" class="form-control" value={{school.sub_domen}} name="sub_domen" maxlength="30" required="" id="id_sub_domen" aria-describedby="basic-addon8" placeholder="example">
                     <div class="input-group-append">
                         <span class="input-group-text" for="basic-addon8">example.gografen.com</span>
                     </div>
                 </div>
                 <div class="input-group input-group-sm mb-3">
                     <div class="custom-file">
-                        <input type="file" class="form-control"  id="id_school_logo_1" name="school_logo_1" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
+                        <input type="file" class="form-control"    id="id_school_logo_1" name="school_logo_1" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
                     </div>
                     <div class="input-group-append">
                         <span class="input-group-text" for="id_school_logo_1">256x64</span>

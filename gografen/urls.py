@@ -29,7 +29,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     # path("auth/", include("authentication.urls")),
     path('api/v1/',include('app.routers')),
-    path('',views.wildcard_redirect),
+    # path('',views.wildcard_redirect),
 ]
 
 if settings.DEBUG:

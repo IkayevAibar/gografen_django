@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     {% if user.is_authenticated %}
-        <title>{{ title }} - {{user.school_name}}</title>
+        <title>{{ title }} - {{school.school_name}}</title>
     {% else %}
         <title>{{ title }} - Gografen</title>
     {% endif %}
     {% if user.is_authenticated %}
-        {% if user.school_logo_2%}
-            <link rel="icon" href="{{user.school_logo_2.url}}">
+        {% if school.school_logo_2%}
+            <link rel="icon" href="{{school.school_logo_2.url}}">
         {% endif%}
     {% endif %}
     
@@ -25,9 +25,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
-
 </head>
 
+{% comment %} {{school.school_logo_1.url}} {% endcomment %}
 <body>
 <div class="wrapper">
         <!-- Sidebar  -->
@@ -35,8 +35,8 @@
             <div class="sidebar-header">
                 <h3>
                 {% if user.is_authenticated %}
-                    {% if user.school_logo_1 %}
-                        <img src="{{user.school_logo_1.url}}" width="200" height="auto" class="d-inline-block align-top" alt="">
+                    {% if school.school_logo_1 %}
+                        <img src="{{school.school_logo_1.url}}" width="200" height="auto" class="d-inline-block align-top" alt="">
                     {% else %}
                         {{user.school_name}}
                     {% endif %}
@@ -124,7 +124,7 @@
             <ul class="list-unstyled CTAs">
                 <footer>
                     {% if user.is_authenticated %}
-                        &copy; {{ year }} -  {{user.school_name}}
+                        &copy; {{ year }} -  {{ school.school_name }}
                     {% else %}
                         &copy; {{ year }} - Gografen
                     {% endif %}
