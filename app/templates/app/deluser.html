@@ -1,0 +1,90 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+<div class="container padding">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+        
+            <div>
+                <div class="card padding">
+                
+                <div class="card-header d-flex flex-row ">
+                    <div class="justify-content mr-5">
+                        <a name="" id="" class="btn btn-primary " href=" {% url 'users' %}" role="button">Back</a>
+                    </div>
+                    <div class="flex-grow-1 ">
+                        Profile Information of <kbd >{{u}}</kbd>. Are u sure?
+                    </div>
+                </div>
+                    <div class="row padding" style="margin-bottom: 20px;margin-top: 20px;">
+                        <div class="col-1"></div>
+                        <div class="col-5">
+                            <div class="row ">
+                                <label class="col-6" for="">Name</label>
+                                <label class="col-6" for="">{{u.first_name}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Surname</label>
+                                <label class="col-6" for="">{{u.last_name}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Fathername</label>
+                                <label class="col-6" for="">{{u.fathername}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">E-mail</label>
+                                <label class="col-6" for="">{{u.email}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Phone</label>
+                                <label class="col-6" for="">{{u.phone}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Gender</label>
+                                <label class="col-6" for="">
+                                {% if u.gender == 0 %}
+                                None
+                                {% else %}
+                                    {% if u.gender == 1 %}
+                                    Male
+                                    {% else %}
+                                    Female
+                                    {% endif %}
+                                {% endif %}
+                                </label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Date of Birth</label>
+                                <label class="col-6" for="">{{u.birth_date}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Country</label>
+                                <label class="col-6" for="">{{u.country}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Lead activity</label>
+                                <label class="col-6" for="">{{u.lead_activity}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Client activity</label>
+                                <label class="col-6" for="">{{u.client_activity}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Is online</label>
+                                <label class="col-6" for="">{{u.is_online}}</label>
+                            </div>
+                            
+                        </div>
+                        <div class="col-1"></div>
+                    </div>
+                    {% if candel %}
+                        <a id="" class="btn btn-danger" href="{% url 'delduser' u.id %}" role="button">confirm to delete</a>
+                    {% else %}
+                            <a id="" class="btn btn-danger disabled" href="#" role="button">delete</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

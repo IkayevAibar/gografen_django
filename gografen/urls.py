@@ -28,10 +28,11 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
     # path("auth/", include("authentication.urls")),
-    path('api/v1/',include('app.routers')),
+    path('',include('app.routers')),
     # path('',views.wildcard_redirect),
 ]
-
+    
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    
+if settings.DEBUG:
+    urlpatterns += static(r'^favicon.ico$', document_root='media/logo/favicon.ico')

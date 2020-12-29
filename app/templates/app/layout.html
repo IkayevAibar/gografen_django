@@ -27,7 +27,7 @@
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
 </head>
 
-{% comment %} {{school.school_logo_1.url}} {% endcomment %}
+{% comment %} {{school.school_logo_1}} {% endcomment %}
 <body>
 <div class="wrapper">
         <!-- Sidebar  -->
@@ -60,17 +60,9 @@
                 </li>
                 {% if user.groups.all.0.name != 'Student' and user.is_authenticated %}
                 <li>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <a href="{% url 'users' %}">
                         Пользователи
                     </a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
-                        <li>
-                            <a href="{% url 'users' %}">Пользователи</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'roles' %}">Роли</a>
-                        </li>
-                    </ul>
                 </li> 
                 {% endif %}
                 <li>
@@ -156,7 +148,8 @@
                             {% endif %}
                             {% if user.is_authenticated %}
                             <li class="nav-item">
-                                <span class="navbar-brand">{{ user.first_name  }} {{user.last_name}}</span>
+                                        
+                                <span class="navbar-brand"><a class="" href="/profile">{{ user.first_name  }} {{user.last_name}}</a></span>
                             </li>
                             <form id="logoutForm" action="/logout/" method="post" class="navbar-right">
                                 {% csrf_token %}
@@ -203,87 +196,3 @@
 
 </body>
 </html>
-
-
- {% comment %} <li class="active">
-                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        Главная
-                    </a>
-                    <ul class="collapse list-unstyled" id="homeSubmenu">
-                        <li>
-                            <a href="{% url 'home' %}">Home 1</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'home' %}">Home 2</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'home' %}">Home 3</a>
-                        </li>
-                    </ul>
-                </li> {% endcomment %}
-                {% comment %} 
-                <li>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        Pages
-                    </a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
-                        <li>
-                            <a href="#">Page 1</a>
-                        </li>
-                        <li>
-                            <a href="#">Page 2</a>
-                        </li>
-                        <li>
-                            <a href="#">Page 3</a>
-                        </li>
-                    </ul>
-                </li> 
-                {% endcomment %}
-
-                   {% comment %} <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">
-                    <img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="">
-                    Gografen
-                </a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'about' %}">About</a></li>
-                    <li><a href="{% url 'contact' %}">Contact</a></li>
-                    {% if user.is_authenticated %}
-                        {% if user.is_staff %}
-                            <li><a href="/admin">Admin</a></li>
-                        {% endif %}
-                    {% endif %}
-                    
-                </ul>
-                {% if user.is_authenticated %}
-                <form id="logoutForm" action="/logout/" method="post" class="navbar-right">
-                    {% csrf_token %}
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><span class="navbar-brand">Hello {{ user.username }}!</span></li>
-                        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
-                    </ul>
-                </form>
-
-                {% else %}
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="{% url 'register' %}">Register</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="{% url 'login' %}">Log in</a></li>
-                </ul>
-
-                {% endif %}
-            </div>
-        </div>
-    </div> {% endcomment %}
-

@@ -7,6 +7,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+
 schema_view = get_schema_view(
    openapi.Info(
       title="Gografen API",
@@ -21,11 +22,24 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-   path('user/<int:pk>/',views.appUserView.as_view({'get':'retrieve','put':'update'})),
-   path('<int:pk>/',views.appUserPublicView.as_view({'get':'retrieve'})),
-   path('register/',views.appUserCreateView.as_view({'post':'create'})),
+   path('profile/<int:pk>/',views.appUserView.as_view({'get':'retrieve','put':'update'})),
+   path('user/<int:pk>/',views.appUserPublicView.as_view({'get':'retrieve'})),
+   path('create/',views.appUserCreateView.as_view({'post':'create'})),
    path('swagger(?P<format>\.json|\.yaml)', schema_view.without_ui(cache_timeout=0), name='schema-json'),
    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-   
+   path('login/',
+         LoginView.as_view
+         (
+             template_name='app/login.html',
+             extra_context=
+             {
+                 'title': 'Log in',
+                 'year' : datetime.now().year,
+             }
+         ),
+         name='login'),
+    path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
+    path('register/', views.register, name='register'),
+
 ]

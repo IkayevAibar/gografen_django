@@ -30,7 +30,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ('title','id', 'cost','short_desc', 'start_date', 'end_date','duration','pub_date','creator_id')
     fieldsets = (
         (None, {'fields': ('id', 'creator_id')}),
-        (_('Информация'), {'fields': ('title', 'cost', 'short_desc','duration','lesson_count')}),
+        (_('Информация'), {'fields': ('title', 'cost', 'short_desc','full_desc','duration','lesson_count','poster','mini_poster')}),
         # (_('Additional info'), {'fields': ('gender', 'phone' ,'birth_date','card','position','country','subdivison','lead_activity','client_activity')}),
         # (_('Permissions'), {
         #     'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),

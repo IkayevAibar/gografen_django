@@ -1,0 +1,32 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card text-center">
+                <div class="card-header d-flex flex-row ">
+                    <div class="justify-content">
+                        <a name="" id="" class="btn btn-primary " href=" {% url 'roles' %}" role="button">Back</a>
+                    </div>
+                    <div class="flex-grow-1 mr-5">
+                        Role:
+                    </div>
+                    
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">Role name: {{role.name}}</h4>
+                    <p class="card-text">Role description: {{role.description}}</p>
+                </div>
+                {% if candel %}
+                        <a id="" class="btn btn-danger" href="{% url 'deldrole' role.id %}" role="button">confirm to delete</a>
+                {% else %}
+                        <a id="" class="btn btn-danger disabled" href="#" role="button">delete</a>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

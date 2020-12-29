@@ -1,0 +1,22 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+<a name="" id="" class="btn btn-primary" href=" {% url 'course' c_id %}" role="button">Back</a>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card text-center">
+                <div class="card-header">
+                    Lesson:
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">{{lesson.title}}</h4>
+                    <p class="card-text">{{lesson.short_desc}}</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

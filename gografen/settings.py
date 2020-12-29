@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django_hosts'
+    'django_hosts',
+    'landing'
 ]
 SITE_ID = 2
 
@@ -65,7 +66,7 @@ MIDDLEWARE_CLASSES = [
 
 ROOT_URLCONF = 'gografen.urls'
 ROOT_HOSTCONF = 'gografen.hosts'
-DEFAULT_HOST = 'app'
+DEFAULT_HOST = 'landing'
 DEFAULT_REDIRECT_URL = "http://localhost:8000"
 
 TEMPLATES = [
@@ -234,8 +235,8 @@ USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
 LOGIN_URL = 'login'
 
 
-SUBDOMAIN_URLCONFS = {
-    None : 'app.urls',  # no subdomain, e.g. ``example.com``
-    '*' : 'app.urls',
-    'api': 'gografen.urls',
-}
+# SUBDOMAIN_URLCONFS = {
+#     None : 'app.urls',  # no subdomain, e.g. ``example.com``
+#     '*' : 'app.urls',
+#     'api': 'gografen.urls',
+# }

@@ -1,6 +1,13 @@
 {% extends "app/layout.html" %}
 
 {% block content %}
+ {% for perm in user.get_group_permissions  %}
+    {% if perm == 'app.add_course' %}
+    <th>
+        <a name="" id="" class="btn btn-primary" href="add" role="button">add</a>
+    </th>
+    {% endif %}
+{% endfor %}
 <table class="table table-striped table-inverse table-responsive">
         <thead class="thead-inverse">
             <tr>
@@ -8,15 +15,9 @@
                 <th>Название</th>
                 <th>Уроки(колич.)</th>
                 <th>Добавлено(дата)</th>
+                <th>Длителность(мин.)</th>
                 <th>Автор</th>
-                {% comment %} {% for perm in user.get_group_permissions  %}
-                    {% if perm == 'auth.add_group' %}
-                    <th>
-                        <a name="" id="" class="btn btn-primary" href="add" role="button">add</a>
-                    </th>
-                    {% endif %}
-                {% endfor %} {% endcomment %}
-                
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -24,9 +25,13 @@
                 <tr>
                     <td scope="row">{{course.id}}</td>
                     <td>{{course.title}}</td>
-                    <td>{{course.lesson_count}}</td>
+                    <td class="text-center">{{course.lesson_count}}</td>
                     <td>{{course.pub_date}}</td>
+                    <td class="text-center">{{course.duration}}</td>
                     <td>{{course.creator_id}}</td>
+                    <td>
+                        <a name="" id="" class="btn btn-primary" href="{{course.id}}" role="button">open</a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

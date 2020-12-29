@@ -20,17 +20,20 @@ class SchoolSettingsChangeForm(forms.ModelForm):
         model=School 
         fields = ('school_name', 'sub_domen', 'school_logo_1','school_logo_2')
 
+class CourseAddForm(forms.ModelForm):
+    class Meta:
+        model=Course 
+        fields = ('title', 'cost', 'poster','mini_poster','short_desc', 'full_desc','end_date','duration')
+
+
 class appUserCreationForm(UserCreationForm):
     first_name = forms.CharField(max_length=30,error_messages={'name_length':"Слишком длинное имя"})
-    last_name = forms.CharField(max_length=30)
     email = forms.EmailField(error_messages={'email_exists':'Email exists'})
-    school_name = forms.CharField(max_length=100)
-    sub_domen = forms.URLField(max_length=30,validators=[validate_gografen])
     phone = forms.CharField(max_length=20)
     
     class Meta:
         model=appUser 
-        fields = ('username', 'password1', 'password2','first_name', 'last_name', 'email','school_name', 'sub_domen','phone')
+        fields = ('username', 'password1', 'password2','first_name','email','phone')
 
 class GroupCreationForm(forms.ModelForm):
     permissions = forms.MultipleChoiceField(label = "Права:", choices=Permission.objects.values_list('id', 'name'), widget = forms.CheckboxSelectMultiple)
@@ -38,7 +41,14 @@ class GroupCreationForm(forms.ModelForm):
     class Meta:
         model=Group 
         fields = ('name','description','permissions')
-        
+
+class GroupChangeForm(forms.ModelForm):
+    permissions = forms.MultipleChoiceField(label = "Права:", choices=Permission.objects.values_list('id', 'name'), widget = forms.CheckboxSelectMultiple)
+    
+    class Meta:
+        model=Group 
+        fields = ('name','description','permissions')
+ 
 class appUserAddingForm(UserCreationForm):
     first_name = forms.CharField(max_length=30,error_messages={'name_length':"Слишком длинное имя"})
     last_name = forms.CharField(max_length=30)
@@ -49,4 +59,9 @@ class appUserAddingForm(UserCreationForm):
     class Meta:
         model=appUser 
         fields = ('username', 'password1', 'password2', 'first_name', 'last_name', 'email', 'phone', 'role')
+
+class appUserChangeForm(forms.ModelForm):
+    class Meta:
+        model=appUser 
+        fields = ('first_name', 'last_name', 'phone', 'fathername','gender','birth_date','country')
 

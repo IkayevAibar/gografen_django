@@ -1,0 +1,89 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+
+<h2>{{ title }}</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section id="addForm">
+            <form action="." method="post" class="form-horizontal">
+                {% csrf_token %}
+                <hr />
+                {{form.errors}}
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-8">
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="id_title" id="basic-addon1">Название:</label> 
+                            </div>
+                            <input type="text" class="form-control" name="title" maxlength="150" autofocus="" aria-label="title" required="" id="id_title" aria-describedby="basic-addon1">
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="id_cost" id="basic-addon4">Стоимость:</label>
+                            </div>
+                            <input type="number" class="form-control  " name="cost" maxlength="30"  required="" id="id_cost"  aria-label="cost" aria-describedby="basic-addon4"> 
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-preend">
+                                <span class="input-group-text" for="id_files">Files</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="form-control"    id="id_pfiles" name="files" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
+                            </div>
+                            
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-preend">
+                                <span class="input-group-text" for="id_mini_poster">128x32</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="form-control"    id="id_mini_poster" name="mini_poster" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
+                            </div>
+                            
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="id_short_desc" id="basic-addon5">Короткое Описание:</label>
+                            </div>
+                            <textarea class="form-control" cols="40" rows="5" name="short_desc" maxlength="200"  required="" id="id_short_desc"  > </textarea>
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="id_full_desc" id="basic-addon5">Полное Описание:</label>
+                            </div>
+                            <textarea class="form-control" cols="40" rows="5" name="full_desc" maxlength="200"  required="" id="id_full_desc"  > </textarea>
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="id_end_date" id="basic-addon31">Дата оконачание:</label>
+                            </div>
+                            <input type="date" class="form-control  " name="end_date" maxlength="30"  required="" id="id_end_date"  aria-label="end_date" aria-describedby="basic-addon"> 
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="id_duration" id="basic-addon6">Длителность:</label>
+                            </div>
+                            <input type="number" class="form-control" name="duration" maxlength="30" value="0"  required="" id="id_duration" placeholder="0 минут" aria-label=" duration" aria-describedby="basic-addon6"> 
+                        </div>
+                </div>
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="hidden" name="next" value="/" />
+                        <input type="submit" name="submit" value="Добавить учебный курс" class="btn btn-default" />
+                    </div>
+                </div>
+            </form>
+        
+        </section>
+    </div>
+    <div class="col-md-4">
+        <section id="socialLoginForm"></section>
+    </div>
+</div>
+
+{% comment %} {{form}} {% endcomment %}
+
+{% endblock %}

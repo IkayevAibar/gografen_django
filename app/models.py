@@ -50,12 +50,11 @@ class School(models.Model):
     def __str__(self):
         return "%s" % (self.school_name)
 
-
 class Course(models.Model):
     title = models.CharField('Название',max_length=20)
     cost = models.IntegerField('Стоимость',default=0,help_text='в тенге')
-    poster = models.TextField('Постер',max_length=1000,blank=True, null=True)
-    mini_poster = models.TextField('Постер',max_length=1000,blank=True, null=True)
+    poster = models.FileField('Постер',upload_to='course',blank=True, null=True)
+    mini_poster = models.FileField('Мини Постер',upload_to='course',blank=True, null=True)
     short_desc = models.TextField('Короткое описание',max_length=200,blank=True, null=True)
     full_desc = models.TextField('Полное описание',max_length=500,blank=True, null=True)
     start_date = models.DateField('Начало даты',default= datetime.date.today)
@@ -67,11 +66,17 @@ class Course(models.Model):
     def update_num_lessons(self):
         self.lesson_count=Lesson.objects.filter(course_id=self).count()
         return self.save(update_fields=["lesson_count"])
+    def update_duration(self):
+        lessons = Lesson.objects.filter(course_id=self)
+        c_dur = 0
+        for l in lessons:
+            c_dur+=l.duration
+        self.duration=c_dur
+        return self.save(update_fields=["duration"])
     def __str__(self):
         return "%s Price:%s tg" % (self.title, self.cost)
 
 class Lesson(models.Model):
-    
     title = models.CharField('Название',max_length=20)
     short_desc = models.TextField('Короткое описание',max_length=200,blank=True, null=True)
     full_desc = models.TextField('Полное описание',max_length=500,blank=True, null=True)
@@ -82,5 +87,4 @@ class Lesson(models.Model):
     teacher_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='Учитель курса')
     def __str__(self):
         return "%s" % (self.title)
-
 

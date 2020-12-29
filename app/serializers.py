@@ -12,7 +12,7 @@ class GetappUserPublicSerializer(serializers.ModelSerializer):
     #Getting public User info
     class Meta:
         model = appUser
-        exclude = ("password","phone","email","groups","user_permissions","last_login","is_active","is_staff","is_superuser")
+        exclude = ("password","phone","card","position","subdivison","email","groups","user_permissions","last_login","is_active","is_staff","is_superuser")
 
 class CreateappUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)

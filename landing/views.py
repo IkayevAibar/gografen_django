@@ -1,6 +1,6 @@
-from django.shortcuts import render
-from datetime import datetime
 from django.shortcuts import render,redirect
+from datetime import datetime
+import requests
 from django.http import HttpRequest,HttpResponse
 
 # Create your views here.

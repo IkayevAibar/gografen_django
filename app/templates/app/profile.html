@@ -1,0 +1,76 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+    
+<div class="container padding">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div>
+                <div class="card padding">
+                    <div class="card-header d-flex flex-row ">
+                    <div class="justify-content mr-5">
+                        <a name="" id="" class="btn btn-primary" href=" {% url 'catalog' %}" role="button">Back</a>
+                    </div>
+                    <div class="flex-grow-1 ">
+                        Profile Information of <kbd >{{user}}</kbd>. Are u sure?
+                    </div>
+                </div>
+                    <div class="row padding" style="margin-bottom: 20px;margin-top: 20px;">
+                    
+                        <div class="col-2"></div>
+                        <div class="col-8">
+                            <div class="row">
+                                <label class="col-6" for="">Name</label>
+                                <label class="col-6" for="">{{ user.first_name}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Surname</label>
+                                <label class="col-6" for="">{{ user.last_name}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Fathername</label>
+                                <label class="col-6" for="">{{ user.fathername}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">E-mail</label>
+                                <label class="col-6" for="">{{ user.email}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Phone</label>
+                                <label class="col-6" for="">{{ user.phone}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Gender</label>
+                                {% if user.gender == 0 %}
+                                    <label class="col-6" for="">None</label>
+                                {% else %}
+                                    {% if user.gender == 1 %}
+                                        <label class="col-6" for="">Male</label>
+                                    {% else %}
+                                        <label class="col-6" for="">Female</label>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Country</label>
+                                <label class="col-6" for="">{{ user.country}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Date of Birth</label>
+                                <label class="col-6" for="">{{ user.birth_date}}</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-6" for="">Account created</label>
+                                <label class="col-6" for="">{{ user.lead_activity}}</label>
+                            </div>
+                        </div>
+                        <div class="col-2"></div>
+                    </div>
+                    <a name="" id="" class="btn btn-info" href="{% url 'users' %}edit/{{user.id}}" role="button">Edit</a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

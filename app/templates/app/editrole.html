@@ -1,0 +1,69 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+<form action="." method="post" class="form-horizontal">
+{% csrf_token %}
+{{form.errors}}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card text-center">
+                <div class="card-header d-flex flex-row ">
+                    <div class="justify-content">
+                        <a name="" id="" class="btn btn-primary " href=" {% url 'roles' %}" role="button">Back</a>
+                    </div>
+                    <div class="flex-grow-1 mr-5">
+                        Role:
+                    </div>
+                    
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">Role name: </h4>
+                    <input type="text" class="form-control  " name="name" maxlength="150" value="{{role.name}}" required="" id="id_name"  aria-label="first name" aria-describedby="basic-addon4"> 
+                    <p class="card-text">Role description: </p>
+                    <input type="text"  class="form-control  " name="description" value="{{role.description}}" maxlength="180"  required="" id="id_description"  aria-label="id_description" aria-describedby="basic-addon5"> 
+                </div>
+                
+                {% for pr,pe in list.items %}
+                        <div class=" col-sm-6 ">
+                            {{pe.content_type}}
+                            <div class="input-group mb-1">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                <input type="checkbox" name="permissions" id="id_permissions_{{pr}}" value="{{pe.id}}" aria-label="Checkbox for following text input">
+                                </div>
+                            </div>
+                            <input type="text" id="checkbox_perm" class="form-control" disabled aria-label="Text input with checkbox" value="{{pe.name}}">
+                            </div>
+                        </div>
+                {% endfor %}
+                {% if candel %}
+                        <input name="" id="" class="btn btn-info" type="submit" value="edit">
+                {% else %}
+                        <a id="" class="btn btn-info disabled" href="#" role="button">edit</a>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+</form> 
+<script>
+a = [];
+{% for perm in role.permissions.all %}
+    a.push("{{perm.name}}");
+{% endfor %}
+b = document.querySelectorAll("#checkbox_perm");
+b.forEach(function(element)
+{
+    for (i = 0; i < a.length; i++) {
+        if(element.value == a[i]){
+            element.parentElement.firstElementChild.firstElementChild.firstElementChild.checked=true;
+        }
+    }
+});
+{% comment %} console.log(b); {% endcomment %}
+</script>
+{% endblock %}
