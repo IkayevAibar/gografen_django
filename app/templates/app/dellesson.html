@@ -1,0 +1,8 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<a name="" id="" class="btn btn-primary" href=" {% url 'course' c_id %}" role="button">Back</a>
+<a name="" id="" class="btn btn-danger" href=" {% url 'deldlesson' c_id lesson.id %}" role="button">confirm to delete</a>
+
+{% endblock %}

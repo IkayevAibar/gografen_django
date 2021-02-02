@@ -33,7 +33,6 @@
                     <th>Автор</th>
                     <th>Action</th>
                     <th>Action</th>
-                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -46,10 +45,7 @@
                         <td class="text-center">{{course.duration}}</td>
                         <td>{{course.creator_id}}</td>
                         <td>
-                            <a name="" id="" class="btn btn-primary" href="{% url 'editcourse' course.id %}" role="button">Изменить</a>
-                        </td>
-                        <td>
-                            <a name="" id="" class="btn btn-primary" href="{{course.id}}" role="button">open</a>
+                            <a name="" id="" class="btn btn-primary" href="{% url 'course' course.id %}" role="button">open</a>
                         </td>
                         <td>
                             <a name="" id="" class="btn btn-danger" href="delete/{{course.id}}" role="button">delete</a>

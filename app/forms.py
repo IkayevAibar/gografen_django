@@ -1,5 +1,5 @@
 from django import forms
-from .models import appUser,Course,Lesson,School
+from .models import Comment, HomeWork, Vector, appUser,Course,Lesson,School
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm
 from django.contrib.auth.models import Group,Permission
 from django.core.exceptions import ValidationError
@@ -23,8 +23,32 @@ class SchoolSettingsChangeForm(forms.ModelForm):
 class CourseAddForm(forms.ModelForm):
     class Meta:
         model=Course 
-        fields = ('title', 'cost', 'poster','mini_poster','short_desc', 'full_desc','end_date','duration')
+        fields = ('title', 'cost', 'poster','mini_poster','short_desc', 'full_desc','end_date','vector_id')
 
+class VectorAddForm(forms.ModelForm):
+    class Meta:
+        model=Vector 
+        fields = ('title','short_desc', 'creator_id')
+
+class HomeworkAddForm(forms.ModelForm):
+    class Meta:
+        model=HomeWork 
+        fields = ('title','desc', 'files')
+
+
+
+class LessonAddForm(forms.ModelForm):
+    class Meta:
+        model=Lesson 
+        fields = ('title', 'files','short_desc', 'full_desc','duration','teacher_id','course_id')
+
+class CommentAddForm(forms.ModelForm):
+    class Meta:
+        model=Comment 
+        fields = ('content','user_id','course_id')
+
+class LessonEditForm(forms.ModelForm):
+    pass
 
 class appUserCreationForm(UserCreationForm):
     first_name = forms.CharField(max_length=30,error_messages={'name_length':"Слишком длинное имя"})

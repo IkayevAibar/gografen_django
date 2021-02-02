@@ -1,0 +1,112 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card text-center">
+                <div class="card-header">
+                    Курс:
+                </div>
+                <div class="card-body">
+                    <form action="" method="POST" class="form-horizontal">
+                        {% csrf_token %}
+                        {{form.errors}}
+                            <div class="col-md-offset-2 col-md-8">
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_title" id="basic-addon1">Название:</label> 
+                                    </div>
+                                    <input type="text" class="form-control" value="{{course.title}}" name="title" maxlength="150" autofocus="" aria-label="title" required="" id="id_title" aria-describedby="basic-addon1">
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_cost" id="basic-addon4">Стоимость:</label>
+                                    </div>
+                                    <input type="number" class="form-control" value="{{course.cost}}" name="cost" maxlength="30"  required="" id="id_cost"  aria-label="cost" aria-describedby="basic-addon4"> 
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-preend">
+                                        <span class="input-group-text" for="id_poster">256x64</span>
+                                    </div>
+                                    <div class="custom-file">
+                                        <input type="file" class="form-control"    id="id_poster" name="poster" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
+                                    </div>
+                                    
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-preend">
+                                        <span class="input-group-text" for="id_mini_poster">128x32</span>
+                                    </div>
+                                    <div class="custom-file">
+                                        <input type="file" class="form-control"    id="id_mini_poster" name="mini_poster" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
+                                    </div>
+                                    
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_short_desc" id="basic-addon5">Короткое Описание:</label>
+                                    </div>
+                                    <textarea class="form-control" cols="40"  rows="5" name="short_desc" maxlength="200"  required="" id="id_short_desc"  > {{course.short_desc}}</textarea>
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_full_desc" id="basic-addon5">Полное Описание:</label>
+                                    </div>
+                                    <textarea class="form-control" cols="40" rows="5" name="full_desc" maxlength="200"  required="" id="id_full_desc"  > {{course.full_desc}}</textarea>
+                                </div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="id_end_date" id="basic-addon31">Дата оконачание:</label>
+                                    </div>
+                                    <input type="date" class="form-control"  value = "{{course.end_date}}" name="end_date" maxlength="30"  required="" id="id_end_date"  aria-label="end_date" aria-describedby="basic-addon"> 
+                                </div>
+                            </div>
+                        <hr />
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <input type="hidden" name="next" value="/" />
+                                <input type="submit" name="submit" value="Изменить учебный курс" class="btn btn-primary" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-header d-flex">
+                Уроки:
+                {% for perm in user.get_group_permissions  %}
+                    {% if perm == 'app.add_lesson' %}
+                    <a name="" id="" class="btn btn-primary ml-auto flex-row-reverse" href="add" role="button">Добавить</a>
+                    {% endif %}
+                {% endfor %}
+                
+
+            </div>
+            <div class="list-group">
+                {% for l in lessons %}
+                    <a 
+                    {% if access %}
+                        href="{% url 'lesson' course.id l.id %}" 
+                    {% else %}
+                        href="" 
+                    {% endif %}
+                    class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{l.title}}</h5>
+                            <small>{{l.id}}</small>
+                        </div>
+                        <p class="mb-1">{{l.duration}} мин</p>
+                        <small>{{l.short_desc}}</small>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        
+
+    </div>
+</div>
+
+{% endblock %}

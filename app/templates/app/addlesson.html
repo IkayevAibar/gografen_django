@@ -7,9 +7,10 @@
 <div class="row">
     <div class="col-md-8">
         <section id="addForm">
-            <form action="." method="post" class="form-horizontal">
+            <form action="http://factory.localhost:8000/courses/1/add" method="post" class="form-horizontal">
                 {% csrf_token %}
                 <hr />
+                
                 {{form.errors}}
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-8">
@@ -20,28 +21,12 @@
                             <input type="text" class="form-control" name="title" maxlength="150" autofocus="" aria-label="title" required="" id="id_title" aria-describedby="basic-addon1">
                         </div>
                         <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_cost" id="basic-addon4">Стоимость:</label>
-                            </div>
-                            <input type="number" class="form-control  " name="cost" maxlength="30"  required="" id="id_cost"  aria-label="cost" aria-describedby="basic-addon4"> 
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
                             <div class="input-group-preend">
                                 <span class="input-group-text" for="id_files">Files</span>
                             </div>
                             <div class="custom-file">
-                                <input type="file" class="form-control"    id="id_pfiles" name="files" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
+                                <input type="file" class="form-control"    id="id_files" name="files" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
                             </div>
-                            
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-preend">
-                                <span class="input-group-text" for="id_mini_poster">128x32</span>
-                            </div>
-                            <div class="custom-file">
-                                <input type="file" class="form-control"    id="id_mini_poster" name="mini_poster" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
-                            </div>
-                            
                         </div>
                         <div class="input-group input-group-sm mb-3">
                             <div class="input-group-prepend">
@@ -57,21 +42,28 @@
                         </div>
                         <div class="input-group input-group-sm mb-3">
                             <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_end_date" id="basic-addon31">Дата оконачание:</label>
-                            </div>
-                            <input type="date" class="form-control  " name="end_date" maxlength="30"  required="" id="id_end_date"  aria-label="end_date" aria-describedby="basic-addon"> 
-                        </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
                                 <label class="input-group-text" for="id_duration" id="basic-addon6">Длителность:</label>
                             </div>
                             <input type="number" class="form-control" name="duration" maxlength="30" value="0"  required="" id="id_duration" placeholder="0 минут" aria-label=" duration" aria-describedby="basic-addon6"> 
                         </div>
                 </div>
+                <div class="form-group">
+                    <label for=""></label>
+                    <select name="teacher_id" id="id_teacher_id" class="custom-select">
+                            <option value="" selected="">---------</option>
+                            {% comment %} <option value="{{user.id}}" >{{user}}</option> {% endcomment %}
+                            {% for teacher in teachers %}
+                                <option value="{{teacher.id}}">{{teacher}}</option>
+                            {% endfor %}
+                            
+
+                    </select>
+                </div>
                 <hr />
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <input type="hidden" name="next" value="/" />
+                        <input type="hidden" name="course_id" value="{{course_id}}" />
                         <input type="submit" name="submit" value="Добавить учебный курс" class="btn btn-default" />
                     </div>
                 </div>

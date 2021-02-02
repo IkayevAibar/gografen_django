@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'rest_framework',
+    'rest_framework.authtoken',
     'djoser',
     'drf_yasg',
     'django.contrib.contenttypes',
@@ -46,10 +47,22 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django_hosts',
-    'landing'
+    'landing',
+    # 'comment',
 ]
-SITE_ID = 2
 
+AUTH_USER_MODEL = 'app.appUser'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Or set up the EMAIL_* settings so that Django can send emails:
+EMAIL_HOST = "smtp.mail.com"
+EMAIL_PORT = "587"
+EMAIL_HOST_USER = "alias@mail.com"
+EMAIL_HOST_PASSWORD = "yourpassword"
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = "Helpdesk <helpdesk@yourdomain>"
+
+SITE_ID = 2
 MIDDLEWARE = [
     'django_hosts.middleware.HostsRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -147,7 +160,6 @@ MEDIA_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['media']))
 
 FIXTURE_DIRS = 'fixtures'
 
-AUTH_USER_MODEL = 'app.appUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (

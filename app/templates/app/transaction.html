@@ -1,0 +1,30 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<form action="" method="POST">
+    {% csrf_token %}
+    Название курса: {{course.title}}
+    <br >
+    Цена: {{course.cost}}
+    <br >
+    Описание: {{course.full_desc}}
+    <br >
+    Количество уроков: {{course.lesson_count}}
+    <br >
+    Длителность: {{course.duration}} мин.
+    <br >
+    Создатель курса: {{course.creator_id}}
+    <br >
+    Направление: {{course.vector_id}}
+    <hr>
+    {% if access %}
+        <button type="button" class="btn btn-primary disabled">Куплено</button>
+        
+    {% else %}
+        <button type="submit" class="btn btn-primary">Купить</button>
+    {% endif %}
+    
+</form>
+
+{% endblock %}

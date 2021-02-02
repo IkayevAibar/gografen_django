@@ -1,6 +1,45 @@
 {% extends "app/layout.html" %}
 
 {% block content %}
+<div class="container ">
+    {% for c in courses %}
+        <div class="col-md-5">
+            <div class="card-header">
+                    {{c.title}}
+                </div>
+            <div class="card mb-4 box-shadow">
+            <img class="card-img-top" data-src="" alt="{{c.title}} [100%x225]" src="media/{{c.poster}}" data-holder-rendered="true" style="height: 225px; width: 100%; display: block;">
+            <div class="card-body">
+                <p class="card-text">{{c.short_desc}}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                    <a href="{% url 'course' c.id %}" type="button" class="btn btn-sm btn-outline-secondary">Открыть</a>
+                    {% comment %} <a href="{% url 'buy' c.id %}" type="button" class="btn btn-sm btn-outline-secondary">Купить за {{c.cost}}ТГ</a> {% endcomment %}
+                    <a href="" type="button" class="btn btn-sm btn-outline-secondary" data-href="delete.php?id=23" data-toggle="modal" data-target="#confirm-delete-{{forloop.counter}}">Купить за {{c.cost}}ТГ</a>
+                </div>
+                <small class="text-muted">{{c.start_date}}</small>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="modal fade" id="confirm-delete-{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    {{c.title}}
+                </div>
+                <div class="modal-body">
+                    Стоимость:{{c.cost}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                    <a href="{% url 'buy' c.id %}" class="btn btn-danger btn-ok">Купить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
 
-
+</div>
 {% endblock %}

@@ -1,0 +1,18 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+{{vector.title}}
+<br >
+{{vector.short_desc}}
+<br >
+{{vector.creator_id}}
+<br >
+<div class="container">
+    <form action="" method="POST">
+    {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

@@ -61,12 +61,13 @@
                             </div>
                             <input type="date" class="form-control  " name="end_date" maxlength="30"  required="" id="id_end_date"  aria-label="end_date" aria-describedby="basic-addon"> 
                         </div>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="id_duration" id="basic-addon6">Длителность:</label>
-                            </div>
-                            <input type="number" class="form-control" name="duration" maxlength="30" value="0"  required="" id="id_duration" placeholder="0 минут" aria-label=" duration" aria-describedby="basic-addon6"> 
-                        </div>
+                        <select class="custom-select" id="id_vector_id" name="vector_id" required>
+                            <option selected>Выбрать...</option>
+                            {% for vector in vectors %}
+                                <option value = {{vector.id}}>{{vector.title}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <hr />
                 <div class="form-group">

@@ -13,8 +13,22 @@
                 <div class="card-body">
                     <h4 class="card-title">{{lesson.title}}</h4>
                     <p class="card-text">{{lesson.short_desc}}</p>
+                    <img src="{{lesson.files}}" class="img-fluid rounded-circle" alt="">
                 </div>
+                {% for perm in user.get_group_permissions  %}
+                    {% if perm == 'app.change_lesson' %}
+                        <a name="" id="" class="btn btn-info" href=" {% url 'editlesson' c_id lesson.id %}" role="button">edit</a>
+                    {% endif %}
+                    {% if perm == 'app.delete_lesson' %}
+                        <a name="" id="" class="btn btn-danger" href=" {% url 'dellesson' c_id lesson.id %}" role="button">delete</a>
+                    {% endif %}
+
+                {% endfor %}
+                {{form}}
+                
+
             </div>
+            
         </div>
         
     </div>

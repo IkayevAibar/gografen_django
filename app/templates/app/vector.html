@@ -1,0 +1,19 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+{{vector.title}}
+<br >
+{{vector.short_desc}}
+<br >
+{{vector.pub_date}}
+<br >
+{{vector.creator_id}}
+<br >
+{{vector.duration}}
+<br >
+{{vector.course_count}}
+<br >
+<a name="" id="" class="btn btn-primary" href="{% url 'editvector' vector.id %}" role="button">Изменить</a>
+
+{% endblock %}

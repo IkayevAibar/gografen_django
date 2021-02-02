@@ -1,10 +1,11 @@
 from datetime import datetime
 from django.shortcuts import render,redirect
-from django.http import HttpRequest,HttpResponse,HttpResponseRedirect
+from django.http import HttpRequest,HttpResponse, HttpResponseNotFound,HttpResponseRedirect
+from django.utils import timezone
 from .serializers import GetappUserSerializer,GetappUserPublicSerializer,CreateappUserSerializer
 # from rest_framework.generics import RetrieveAPIView,UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
-from .models import appUser,Course,Lesson,School
+from .models import Course_user, Vector, appUser,Course,Lesson,School
 from rest_framework import permissions 
 from django.core.exceptions import ValidationError
 from django import forms
@@ -34,7 +35,7 @@ from django.contrib.sites.models import Site
 from django.urls import reverse
 from app.forms import *
 from gografen.settings import MEDIA_ROOT
-
+from rest_framework.authtoken.models import Token
 # from django.contrib.auth.mixins import UserPassesTestMixin
 # from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -77,7 +78,9 @@ class appUserCreateView(ModelViewSet):
 
 @login_required
 def home(request):
+    print(request.get_host())
     sub_domain = request.get_host().split('.')[0]
+    print(sub_domain)
     user_school = request.user.school_id.sub_domen
     if(user_school == (sub_domain+".gografen.com")):
         school = School.objects.filter(sub_domen=request.user.school_id.sub_domen)[0]
@@ -97,6 +100,23 @@ def home(request):
             return HttpResponseRedirect(new_url)
     else:
         return redirect('logout')
+from django.utils.datastructures import MultiValueDict as MVD
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def login_by_token(request):
+    sub_domain = request.get_host().split('.')[0]
+    token_user = Token.objects.get_or_create(key=MVD(request.GET)['token'])
+    # print(token_user[0].user.id)
+    user = appUser.objects.filter(id=token_user[0].user.id).first()
+    login(request,user)
+    # user = authenticate(username=user.username, password=user.password)
+    if user is not None:
+        return redirect('home')
+    else:
+        return redirect('login')
+
+
+
 
 def register(request):
     new_url = "http://localhost:8000"
@@ -104,13 +124,14 @@ def register(request):
     if(request.get_host().split('.')[0] == 'localhost:8000'):
         if request.method == 'POST':
             f = appUserCreationForm(request.POST)
-            try:
-                send_mail('Test', 'Message', 'gografen@test.com', user.email)
-            except Exception:
-                pass
+            
             if f.is_valid():
                 user=f.save()
-                school = School(sub_domen = user.id+".gografen.com", school_name = user.first_name,creator_id=user)
+                try:
+                    send_mail('Test', 'Message', 'gografen@test.com', user.email)
+                except Exception:
+                    pass
+                school = School(sub_domen = str(user.id)+".gografen.com", school_name = user.first_name,creator_id=user)
                 school.save()
                 user.school_id = school
                 group_role = Group.objects.get(name='MainTeacher')
@@ -195,7 +216,7 @@ def users(request):
             request,
             'app/users.html',
             {
-                    'title':'Users',
+                'title':'Users',
                 'message':'Your application description page.',
                 'year':datetime.now().year,
                 'users':users,
@@ -367,6 +388,7 @@ def edituser(request,id):
 def editeduser(request,id):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
+    can=False
     if(sub_domain != "localhost:8000"):
         u = appUser.objects.filter(id=id)[0]
         if request.method == 'POST':
@@ -566,6 +588,15 @@ def catalog(request):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
     if(sub_domain != "localhost:8000"):
+        courses = Course.objects.all()
+        list_=[]
+        for course in courses:
+            print(course.creator_id.school_id)
+            if(request.user.school_id == course.creator_id.school_id):
+                list_.append(course)
+        for c in list_:
+            c.update_num_lessons()
+            c.update_duration()
         """Renders the catalog page."""
         assert isinstance(request, HttpRequest)
         return render(
@@ -576,10 +607,289 @@ def catalog(request):
                 'message':'Your application description page.',
                 'year':datetime.now().year,
                 'school':school,
+                'courses':courses,
             }
         )
     else:
         return redirect('main')
+
+@login_required
+def vectors(request):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        vectors = Vector.objects.all()
+        list_=[]
+        for vector in vectors:
+            print(vector.creator_id.school_id)
+            if(request.user.school_id == vector.creator_id.school_id):
+                # access = Course_user.objects.filter(course_id=course,student_id=request.user).first()
+                # print(access)
+                # if(access):
+                list_.append(vector)
+        for v in list_:
+            v.update_num_courses()
+            v.update_duration()
+        """Renders the courses page."""
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/vectors.html',
+            {
+                'title':'Courses',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'vectors':list_,
+            }
+        )
+    else:
+        return redirect('main')
+
+
+@permission_required('app.add_course')
+def addvector(request):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        
+        if request.method == 'POST':
+            form = VectorAddForm(request.POST)
+            if form.is_valid():
+                print(form.data)
+                form.save()
+                return redirect('vectors')
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/addvector.html',
+                    {
+                        'title':'Adding Course',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school':school,
+                        'form':form,
+                    }
+                )
+        else:
+            form = VectorAddForm()
+        """Renders the catalog page."""
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/addvector.html',
+            {
+                'title':'Adding Course',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school':school,
+                'form':form,
+            }
+        )
+    else:
+        return redirect('main')
+  
+
+@login_required
+def homework(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        course = Course.objects.filter(id=id)
+        access = Course_user.objects.filter(course_id=course,student_id=request.user)
+        if(request.user.school_id != course.creator_id.school_id):
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+        
+
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/homework.html',
+            {
+                'title':'Course ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+            }
+        )
+    else:
+        return redirect('main')
+
+
+@login_required
+def edithomework(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        vector = Vector.objects.filter(id=id).first()
+        if(request.user.school_id != vector.creator_id.school_id):
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+        """Renders the courses page."""
+        if request.method == 'POST':
+            form = VectorAddForm(request.POST)
+            if form.is_valid():
+                print(form.data)
+                # form.save()
+                vector.title = form.data['title']
+                vector.short_desc = form.data['short_desc']
+                vector.creator_id = appUser.objects.get(id=form.data['creator_id'])
+
+                vector.save(update_fields=["title","short_desc","creator_id"])
+                return redirect('vectors')
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/edithomework.html',
+                    {
+                        'title':'Adding Course',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school':school,
+                        'form':form,
+                    }
+                )
+        else:
+            form = VectorAddForm()
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/edithomework.html',
+            {
+                'title':'Course ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'vector':vector,
+                'form':form,
+            }
+        )
+    else:
+        return redirect('main')
+
+
+@permission_required('app.add_course')
+def addhomework(request):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        
+        if request.method == 'POST':
+            form = VectorAddForm(request.POST)
+            if form.is_valid():
+                print(form.data)
+                form.save()
+                return redirect('vectors')
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/addhomework.html',
+                    {
+                        'title':'Adding Course',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school':school,
+                        'form':form,
+                    }
+                )
+        else:
+            form = VectorAddForm()
+        """Renders the catalog page."""
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/addhomework.html',
+            {
+                'title':'Adding Course',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school':school,
+                'form':form,
+            }
+        )
+    else:
+        return redirect('main')
+  
+
+@login_required
+def vector(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        vector = Vector.objects.filter(id=id).first()
+        if(request.user.school_id != vector.creator_id.school_id):
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+        
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/vector.html',
+            {
+                'title':'Course ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'vector':vector,
+            }
+        )
+    else:
+        return redirect('main')
+
+
+@login_required
+def editvector(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        vector = Vector.objects.filter(id=id).first()
+        if(request.user.school_id != vector.creator_id.school_id):
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+        """Renders the courses page."""
+        if request.method == 'POST':
+            form = VectorAddForm(request.POST)
+            if form.is_valid():
+                print(form.data)
+                # form.save()
+                vector.title = form.data['title']
+                vector.short_desc = form.data['short_desc']
+                vector.creator_id = appUser.objects.get(id=form.data['creator_id'])
+
+                vector.save(update_fields=["title","short_desc","creator_id"])
+                return redirect('vectors')
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/editvector.html',
+                    {
+                        'title':'Adding Course',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school':school,
+                        'form':form,
+                    }
+                )
+        else:
+            form = VectorAddForm()
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/editvector.html',
+            {
+                'title':'Course ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'vector':vector,
+                'form':form,
+            }
+        )
+    else:
+        return redirect('main')
+
+
 
 @login_required
 def courses(request):
@@ -587,7 +897,12 @@ def courses(request):
     sub_domain = request.get_host().split('.')[0]
     if(sub_domain != "localhost:8000"):
         courses = Course.objects.all()
-        for c in courses:
+        list_=[]
+        for course in courses:
+            print(course.creator_id.school_id)
+            if(request.user.school_id == course.creator_id.school_id):
+                list_.append(course)
+        for c in list_:
             c.update_num_lessons()
             c.update_duration()
         """Renders the courses page."""
@@ -600,20 +915,87 @@ def courses(request):
                 'message':'Your application description page.',
                 'year':datetime.now().year,
                 'school': school,
-                'courses':courses,
+                'courses':list_,
             }
         )
     else:
         return redirect('main')
 
 @login_required
-def course(request,id):
+def mycourses(request):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
     if(sub_domain != "localhost:8000"):
-        course = Course.objects.filter(id=id)
-        lessons = Lesson.objects.filter(course_id=course[0])
+        courses = Course.objects.all()
+        list_=[]
+        for course in courses:
+            print(course.creator_id.school_id)
+            if(request.user.school_id == course.creator_id.school_id):
+                access = Course_user.objects.filter(course_id=course,student_id=request.user).first()
+                print(access)
+                if(access):
+                    list_.append(course)
+        for c in list_:
+            c.update_num_lessons()
+            c.update_duration()
         """Renders the courses page."""
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/mycourses.html',
+            {
+                'title':'Courses',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'courses':list_,
+            }
+        )
+    else:
+        return redirect('main')
+
+
+
+@login_required
+def course(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    comments = Comment.objects.filter(course_id=id)
+    if(sub_domain != "localhost:8000"):
+        course = Course.objects.filter(id=id)
+        access = Course_user.objects.filter(course_id=id,student_id=request.user).first()
+        print(access)
+        lessons = Lesson.objects.filter(course_id=course[0])
+        if(request.user.school_id != course[0].creator_id.school_id):
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+        """Renders the courses page."""
+        print(request.method)
+        if request.method == 'POST':
+            form = CommentAddForm(request.POST)
+            print(form)
+            if form.is_valid():
+                form.save()
+                
+                return redirect('course',id)
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/course.html',
+                    {
+                        'title':'Course ',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school': school,
+                        'course':course[0],
+                        'lessons':lessons,
+                        'comments':comments,
+                        'access':access,
+                    }
+                )
+        else:
+            form = CommentAddForm()
+        
         assert isinstance(request, HttpRequest)
         return render(
             request,
@@ -624,42 +1006,88 @@ def course(request,id):
                 'year':datetime.now().year,
                 'school': school,
                 'course':course[0],
-                'lessons':lessons
+                'lessons':lessons,
+                'comments':comments,
+                'access':access,
+                'form':form,
             }
         )
     else:
         return redirect('main')
 
 @login_required
-def lesson(request,id,l_id):
+def editcourse(request,id):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
     if(sub_domain != "localhost:8000"):
-        lesson = Lesson.objects.filter(id=l_id)
+        course = Course.objects.filter(id=id).first()
+        lessons = Lesson.objects.filter(course_id=course)
+        if(request.user.school_id != course.creator_id.school_id):
+            return HttpResponseNotFound('<h1>Page not found</h1>')
         """Renders the courses page."""
+        print(request.method)
+        if request.method == 'POST':
+            form = CourseAddForm(request.POST,request.FILES or None, instance=request.user)
+            if form.is_valid():
+                print("valid")
+                # form.save()
+                course.title = form.data['title']
+                course.cost = form.data['cost']
+                course.poster = request.FILES.get('poster', None)
+                course.mini_poster = request.FILES.get('mini_poster', None)
+                course.short_desc = form.data['short_desc']
+                course.full_desc = form.data['full_desc']
+                course.end_date = form.data['end_date']
+
+                course.save(update_fields=["title","cost","poster","mini_poster","short_desc","full_desc","end_date"])
+                
+                return redirect('courses')
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/editcourse.html',
+                    {
+                        'title':'Adding Course',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school':school,
+                        'course':course,
+                        'form':form,
+                        'lessons':lessons,
+                    }
+                )
+        else:
+            form = CourseAddForm()
         assert isinstance(request, HttpRequest)
         return render(
             request,
-            'app/lesson.html',
+            'app/editcourse.html',
             {
                 'title':'Course ',
                 'message':'Your application description page.',
                 'year':datetime.now().year,
                 'school': school,
-                'c_id':id,
-                'lesson':lesson[0],
+                'course':course,
+                'form':form,
+                'lessons':lessons,
             }
         )
     else:
         return redirect('main')
 
 
+
 @permission_required('app.add_course')
 def addcourse(request):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
+    vectors= Vector.objects.filter()
     if(sub_domain != "localhost:8000"):
-        
+        list_=[]
+        for vector in vectors:
+            if(request.user.school_id == vector.creator_id.school_id):
+                list_.append(vector)
         if request.method == 'POST':
             form = CourseAddForm(request.POST,request.FILES or None, instance=request.user)
             if form.is_valid():
@@ -667,14 +1095,13 @@ def addcourse(request):
                 course = Course()
                 course.title = form.data['title']
                 course.cost = form.data['cost']
-                course.poster = form.data['poster'] or request.FILES.get('poster', None)
-                course.mini_poster = form.data['mini_poster'] or request.FILES.get('mini_poster', None)
+                course.poster = request.FILES.get('poster', None)
+                course.mini_poster = request.FILES.get('mini_poster', None)
                 course.short_desc = form.data['short_desc']
                 course.full_desc = form.data['full_desc']
                 course.end_date = form.data['end_date']
-                course.duration = form.data['duration']
                 course.creator_id = request.user
-
+                course.vector_id = vectors.filter(id=form.data['vector_id']).first()
                 course.save()
                 
                 return redirect('courses')
@@ -689,6 +1116,7 @@ def addcourse(request):
                         'year':datetime.now().year,
                         'school':school,
                         'form':form,
+                        'vectors':list_,
                     }
                 )
         else:
@@ -704,24 +1132,235 @@ def addcourse(request):
                 'year':datetime.now().year,
                 'school':school,
                 'form':form,
+                'vectors':list_,
+
             }
         )
     else:
         return redirect('main')
   
 
+
+@login_required
+def buy(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        course = Course.objects.filter(id=id).first()
+        access = Course_user.objects.filter(course_id=course,student_id=request.user)
+        if(request.user.school_id != course.creator_id.school_id):
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+        """Renders the courses page."""
+        if(request.method=="POST"):
+            Course_user.objects.get_or_create(course_id=course,student_id=request.user,activity=timezone.now())
+            user = appUser.objects.get(id=request.user.id)
+            user.client_activity = timezone.now()
+            user.save(update_fields=["client_activity"])
+
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/transaction.html',
+            {
+                'title':'Course ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'course':course,
+                'access':access,
+            }
+        )
+    else:
+        return redirect('main')
+
+
+@permission_required('app.delete_course')
+def delcourse(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        course = Course.objects.filter(id=id)[0]
+        lessons = Lesson.objects.filter(course_id=course)
+        if(request.user.school_id != course.creator_id.school_id):
+            return redirect('courses')
+        """Renders the courses page."""
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/delcourse.html',
+            {
+                'title':'Deleting Course ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'course':course,
+                'lessons':lessons
+            }
+        )
+    else:
+        return redirect('main')
+
+
+@permission_required('app.delete_course')
+def deldcourse(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        course = Course.objects.filter(id=id)
+        lessons = Lesson.objects.filter(course_id=course[0])
+        if(request.user.school_id != course[0].creator_id.school_id):
+            return redirect('courses')
+        
+        course.delete()
+        if(lessons.count()>0):
+            for lesson in lessons:
+                if(lesson!=None):
+                    lesson.delete()
+        return redirect('courses')
+    else:
+        return redirect('main')
+
+
+@login_required
+def lesson(request,id,l_id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        lesson = Lesson.objects.filter(id=l_id)
+
+        if(request.user.school_id != lesson[0].course_id.creator_id.school_id):
+            return redirect('courses')
+        
+        access = Course_user.objects.filter(course_id=id,student_id=request.user)
+        l = request.user.groups.values_list('name',flat = True).first()
+        if(access.count()<1 and l!='MainTeacher' and l!='Teacher'):
+            return redirect('course',id)
+        if(request.method=='POST'):
+            form = HomeworkAddForm()
+        else:
+            form = HomeworkAddForm()
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/lesson.html',
+            {
+                'title':'Course ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'c_id':id,
+                'form':form,
+                'lesson':lesson[0],
+            }
+        )
+    else:
+        return redirect('main')
+
+@login_required
+def dellesson(request,id,l_id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        lesson = Lesson.objects.filter(id=l_id)
+        if(request.user.school_id != lesson[0].course_id.creator_id.school_id):
+            return redirect('courses')
+        
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/dellesson.html',
+            {
+                'title':'Course ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'c_id':id,
+                'lesson':lesson[0],
+            }
+        )
+    else:
+        return redirect('main')
+
+def deldlesson(request,id,l_id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        lesson = Lesson.objects.filter(id=l_id)
+        if(request.user.school_id != lesson[0].course_id.creator_id.school_id):
+            return redirect('courses')
+        lesson.delete()
+        return redirect('course',id)
+    else:
+        return redirect('main')
+
+def editlesson(request,id,l_id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    school_teachers = appUser.objects.filter(groups=(Group.objects.filter(name="Teacher")[0]),school_id=school.id)
+    if(sub_domain != "localhost:8000"):
+        if request.method == 'POST':
+            form = LessonAddForm(request.POST,request.FILES or None,instance=request.user)
+            print(form)
+            if form.is_valid():
+                # form.save()
+                lesson = Lesson.objects.filter(id=l_id).first()
+                lesson.title = form.data['title']
+                lesson.files = request.FILES.get('files', None)
+                lesson.short_desc = form.data['short_desc']
+                lesson.full_desc = form.data['full_desc']
+                lesson.duration = form.data['duration']
+                lesson.teacher_id = appUser.objects.get(id=form.data['teacher_id'])
+                lesson.course_id = Course.objects.get(id=form.data['course_id'])
+
+                lesson.save(update_fields=['title', 'files','short_desc', 'full_desc','duration','teacher_id','course_id'])
+                return redirect('course',id)
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/editlesson.html',
+                    {
+                        'title':'Adding Course',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school':school,
+                        'form':form,
+                        'teachers':school_teachers,
+                    }
+                )
+        else:
+            form = LessonAddForm()
+        """Renders the catalog page."""
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/editlesson.html',
+            {
+                'title':'Adding Lesson',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school':school,
+                'form':form,
+                'teachers':school_teachers,
+            }
+        )
+    else:
+        return redirect('main')
+ 
+
 @permission_required('app.add_lesson')
 def addlesson(request,id):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
+    school_teachers = appUser.objects.filter(groups=(Group.objects.filter(name="Teacher")[0]),school_id=school.id)
     if(sub_domain != "localhost:8000"):
-        
-        if request.method == 'POST':
-            form = CourseAddForm(request.POST)
+        print(request.method)
+        if(request.method == 'POST'):
+            form = LessonAddForm(request.POST,request.FILES or None)
+            print(form.data)
             if form.is_valid():
                 form.save()
-                
-                return redirect('courses')
+                return redirect('course',id)
             else:
                 assert isinstance(request, HttpRequest)
                 return render(
@@ -731,25 +1370,28 @@ def addlesson(request,id):
                         'title':'Adding Course',
                         'message':'Your application description page.',
                         'year':datetime.now().year,
+                        'course_id':id,
                         'school':school,
                         'form':form,
+                        'teachers':school_teachers,
                     }
                 )
         else:
-            form = CourseAddForm()
-        """Renders the catalog page."""
-        assert isinstance(request, HttpRequest)
-        return render(
-            request,
-            'app/addlesson.html',
-            {
-                'title':'Adding Lesson',
-                'message':'Your application description page.',
-                'year':datetime.now().year,
-                'school':school,
-                'form':form,
-            }
-        )
+            form = LessonAddForm()
+            assert isinstance(request, HttpRequest)
+            return render(
+                request,
+                'app/addlesson.html',
+                {
+                    'title':'Adding Lesson',
+                    'message':'Your application description page.',
+                    'year':datetime.now().year,
+                    'course_id':id,
+                    'school':school,
+                    'form':form,
+                    'teachers':school_teachers,
+                }
+            )
     else:
         return redirect('main')
   

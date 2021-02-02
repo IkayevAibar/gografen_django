@@ -27,10 +27,10 @@ class CourseAdmin(admin.ModelAdmin):
     raw_id_fields=["creator_id"]
     wrapper_kwargs={""}
     readonly_fields = ('id',)
-    list_display = ('title','id', 'cost','short_desc', 'start_date', 'end_date','duration','pub_date','creator_id')
+    list_display = ('title','id', 'cost','short_desc', 'start_date', 'end_date','duration','pub_date','creator_id','vector_id')
     fieldsets = (
         (None, {'fields': ('id', 'creator_id')}),
-        (_('Информация'), {'fields': ('title', 'cost', 'short_desc','full_desc','duration','lesson_count','poster','mini_poster')}),
+        (_('Информация'), {'fields': ('title', 'cost', 'short_desc','full_desc','vector_id','duration','lesson_count','poster','mini_poster')}),
         # (_('Additional info'), {'fields': ('gender', 'phone' ,'birth_date','card','position','country','subdivison','lead_activity','client_activity')}),
         # (_('Permissions'), {
         #     'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
@@ -49,11 +49,22 @@ class SchoolAdmin(admin.ModelAdmin):
         (_('Информация'), {'fields': ( 'sub_domen', 'school_logo_1','school_logo_2')}),
     )
 
+class CommentAdmin(admin.ModelAdmin):
+    readonly_fields = ('id',)
+    list_display = ('id','user_id', 'course_id','content')
+    fieldsets = (
+        (None, {'fields': ('id', 'user_id', 'course_id','content')}),
+    )
+
 
 
 admin.site.register(appUser,appUserAdmin)
 admin.site.register(Course,CourseAdmin)
 admin.site.register(Lesson)
+admin.site.register(Course_user)
+admin.site.register(Vector)
 admin.site.register(School,SchoolAdmin)
+admin.site.register(Comment,CommentAdmin)
+
 
 # Register your models here.
