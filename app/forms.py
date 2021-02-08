@@ -33,14 +33,14 @@ class VectorAddForm(forms.ModelForm):
 class HomeworkAddForm(forms.ModelForm):
     class Meta:
         model=HomeWork 
-        fields = ('title','desc', 'files')
+        fields = ('title','desc', 'files','student_id','course_id','lesson_id')
 
 
 
 class LessonAddForm(forms.ModelForm):
     class Meta:
         model=Lesson 
-        fields = ('title', 'files','short_desc', 'full_desc','duration','teacher_id','course_id')
+        fields = ('title', 'files','video','short_desc', 'full_desc','duration','teacher_id','course_id')
 
 class CommentAddForm(forms.ModelForm):
     class Meta:

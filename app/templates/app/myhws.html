@@ -1,0 +1,60 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+<a name="" id="" class="btn btn-primary" href="{% url 'addhw' %}" role="button">Добавить</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Курс</th>
+            <th>Урок</th>
+            <th>Название ДЗ</th>
+            <th>Время</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for hw in hws %}
+                <tr>
+                    <td scope="row">
+                    <a href="{% url 'course' hw.course_id.id %}">
+                    {{hw.course_id.title}}
+                    </a>
+                    </td>
+                    <td>
+                    <a href="{% url 'lesson' hw.course_id.id hw.lesson_id.id %}">
+                    {{hw.lesson_id.title}}
+                    </a>
+                    </td>
+                    <td>
+                    <a href="{% url 'homework' hw.id %}">
+                    {{hw.title}}
+                    </a></td>
+                    <td>{{hw.pub_date}}</td>
+                    <td>
+
+                        <a href="" type="button" class="btn btn-sm btn-outline-primary" data-href="delete.php?id=23" data-toggle="modal" data-target="#confirm-delete-{{forloop.counter}}">Действие</a>
+                    </td>
+                    <div class="modal fade" id="confirm-delete-{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    {{hw.student_id}} | {{hw.title}}
+                                </div>
+                                <div class="modal-body">
+                                    [{{hw.pub_date}}] - {{hw.desc}}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                                    <a name="" id="" class="btn btn-primary" href="{% url 'edithomework' hw.id %}" role="button">Изменить</a>
+                                    <a href="{% url 'deletehomework' hw.id %}" class="btn btn-danger btn-ok">Удалить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

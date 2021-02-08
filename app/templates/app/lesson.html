@@ -1,36 +1,80 @@
 {% extends "app/layout.html" %}
 
 {% block content %}
-<a name="" id="" class="btn btn-primary" href=" {% url 'course' c_id %}" role="button">Back</a>
 
 <div class="container-fluid">
+    <a name="" id="" class="btn btn-primary" href=" {% url 'course' c_id.id %}" role="button">Back</a>
     <div class="row">
         <div class="col-md-9">
             <div class="card text-center">
                 <div class="card-header">
-                    Lesson:
+                    Урок:
                 </div>
                 <div class="card-body">
                     <h4 class="card-title">{{lesson.title}}</h4>
-                    <p class="card-text">{{lesson.short_desc}}</p>
-                    <img src="{{lesson.files}}" class="img-fluid rounded-circle" alt="">
+                    <p class="card-text">{{lesson.full_desc}}</p>
+                    {% comment %} <img src="{{lesson.files.url}}" class="img-fluid rounded-circle" alt=""> {% endcomment %}
+                    {% if lesson.video %}
+                    <video width="800" height="480" controls>
+                        <source src="{{lesson.video.url}}" type="video/mp4">
+                        {% comment %} <source src="movie.ogg" type="video/ogg"> {% endcomment %}
+                        Your browser does not support the video tag.
+                    </video>
+                    {% endif %}
+                    
                 </div>
                 {% for perm in user.get_group_permissions  %}
                     {% if perm == 'app.change_lesson' %}
-                        <a name="" id="" class="btn btn-info" href=" {% url 'editlesson' c_id lesson.id %}" role="button">edit</a>
+                        <a name="" id="" class="btn btn-info" href=" {% url 'editlesson' c_id.id lesson.id %}" role="button">edit</a>
                     {% endif %}
                     {% if perm == 'app.delete_lesson' %}
-                        <a name="" id="" class="btn btn-danger" href=" {% url 'dellesson' c_id lesson.id %}" role="button">delete</a>
+                        <a name="" id="" class="btn btn-danger" href=" {% url 'dellesson' c_id.id lesson.id %}" role="button">delete</a>
                     {% endif %}
 
                 {% endfor %}
-                {{form}}
-                
-
             </div>
-            
+            {% if is_sent %}
+            <a name="" id="" class="btn btn-secondary btn-lg btn-block disabled" href="" role="button"> Домашнее задание сделано</a>
+            {% else %}
+            <a name="" id="" class="btn btn-secondary btn-lg btn-block" href="{% url 'addhomework' c_id.id lesson.id %}" role="button"> Сдать домашнее задание</a>
+            {% endif %}
         </div>
         
+        <div class="col-md-3">
+            <div class="card-header d-flex">
+                Уроки:
+                {% for perm in user.get_group_permissions  %}
+                    {% if perm == 'app.add_lesson' %}
+                    <a name="" id="" class="btn btn-primary ml-auto flex-row-reverse" href="{% url 'addlesson' c_id.id %}" role="button">Добавить</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="list-group">
+                {% for l in lessons %}
+                    <a 
+                    role="button"
+                    {% if access or user.id == c_id.creator_id.id %}
+                        href="{% url 'lesson' c_id.id l.id %}"
+                    {% else %}
+                        href="" 
+                    {% endif %}
+                    class="list-group-item list-group-item-action flex-column align-items-start {% if l.id == lesson.id %}disabled{% endif %}"
+                    {% if l.id == lesson.id %} aria-disabled="true"{% endif %}
+                    >
+
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{l.title}}</h5>
+                            <small>{{forloop.counter}}</small>
+                        </div>
+                        <p class="mb-1">{{l.duration}} мин</p>
+                        <small>{{l.short_desc}}</small>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-9">
+              
+        </div>
     </div>
 </div>
 {% endblock %}

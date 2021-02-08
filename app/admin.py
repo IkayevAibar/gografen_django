@@ -63,6 +63,8 @@ admin.site.register(Course,CourseAdmin)
 admin.site.register(Lesson)
 admin.site.register(Course_user)
 admin.site.register(Vector)
+admin.site.register(HomeWork)
+admin.site.register(KnowledgeBase)
 admin.site.register(School,SchoolAdmin)
 admin.site.register(Comment,CommentAdmin)
 

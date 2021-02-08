@@ -1,0 +1,29 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+            <form action="" method="post" class="card text-center" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% comment %} {{form}} {% endcomment %}
+                <label for="id_title">Название:</label>
+                <input type="text" name="title" maxlength="20" id="id_title"
+                {% if hw %}
+                    value="{{hw.title}}"
+                {% endif %}
+                >
+                <label for="id_desc">Короткое описание:</label>
+                <textarea name="desc" cols="40" rows="10" maxlength="200" id="id_desc">{{hw.desc}}</textarea>
+                <label for="id_files">Содержание ДЗ:</label>
+                <input type="file" name="files" id="id_files">
+                <input type="text" class="form-control d-none" name="lesson_id" id="inputName" placeholder="" value="{{l_id.id}}">
+                <input type="text" class="form-control d-none" name="course_id" id="inputName" placeholder="" value="{{c_id}}">
+                <input type="text" class="form-control d-none" name="student_id" id="inputName" placeholder="" value="{{user.id}}">
+                <hr>
+                <button type="submit" class="btn btn-primary">Отправить</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

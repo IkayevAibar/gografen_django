@@ -1,0 +1,46 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Отправитель</th>
+            <th>Курс</th>
+            <th>Коммент</th>
+            <th>Время</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for c in cc %}
+        <tr>
+            <td scope="row">{{c.user_id}}</td>
+            <td>{{c.course_id.title}}</td>
+            <td>{{c.content}}</td>
+            <td>{{c.pub_date}}</td>
+            <td>
+                <a href="" type="button" class="btn btn-sm btn-outline-primary" data-href="delete.php?id=23" data-toggle="modal" data-target="#confirm-delete-{{forloop.counter}}">Действие</a>
+            </td>
+            <div class="modal fade" id="confirm-delete-{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            Коммент от {{c.user_id}} | {{c.course_id.title}}
+                        </div>
+                        <div class="modal-body">
+                            [{{c.pub_date}}] - {{c.content}}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                            <a name="" id="" class="btn btn-primary" href="#" role="button">Изменить</a>
+                            <a href="{% url 'delcomment' c.id %}" class="btn btn-danger btn-ok">Удалить</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}

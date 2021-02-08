@@ -10,7 +10,7 @@
                     Курс:
                 </div>
                 <div class="card-body">
-                    <form action="" method="POST" class="form-horizontal">
+                    <form action="" method="POST" class="form-horizontal" enctype="multipart/form-data">
                         {% csrf_token %}
                         {{form.errors}}
                             <div class="col-md-offset-2 col-md-8">

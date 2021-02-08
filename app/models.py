@@ -1,3 +1,4 @@
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import timezone
 import datetime
@@ -12,15 +13,24 @@ from django.contrib.contenttypes.fields import GenericRelation
 
 Group.add_to_class('description', models.CharField(max_length=180,null=True, blank=True))
 
-def content_file_name(instance, filename):
-    filename = "%s" % ('favicon.ico',)
+def content_file_name_logo(instance, filename):
     return os.path.join(str(instance.id),'logo',filename)
+
+def content_file_name_courses(instance, filename):
+    return os.path.join(str(instance.creator_id.school_id.id),'courses',str(instance.title)+"_"+str(instance.creator_id.school_id.id) ,filename)
+
+def content_file_name_knowledge(instance, filename):
+    if(instance.lesson_id):
+        return os.path.join(str(instance.course_id.creator_id.school_id.id),'knowledgebase',str(instance.course_id.id),str(instance.lesson_id.id),filename)
+    else:
+        return os.path.join(str(instance.course_id.creator_id.school_id.id),'knowledgebase',str(instance.course_id.id),filename)
 
 def get_upload_path(instance, filename):
     return os.path.join(
       "knowledge","school_%d" % instance.school_id.id, "user_%d" % instance.id,filename)
 
 # Create your models here.
+
 class appUser(AbstractUser):
     def has_group(user, group_name):
         return user.groups.filter(name=group_name).exists()
@@ -48,10 +58,11 @@ class appUser(AbstractUser):
         return "%s %s" % (self.first_name, self.last_name)
 
 class School(models.Model):
+    fs = FileSystemStorage(location='/media/photos')
     school_name = models.CharField('Школа',max_length=20,null=True,blank=True,unique=True)
     sub_domen = models.CharField('Домен',max_length=30,null=True,blank=True,unique=True)
-    school_logo_1 = models.FileField('Лого 250x64',upload_to=content_file_name,blank=True, null=True)
-    school_logo_2 = models.FileField('Лого 16x16',upload_to=content_file_name,blank=True, null=True)
+    school_logo_1 = models.FileField('Лого 250x64',upload_to=content_file_name_logo,blank=True, null=True)
+    school_logo_2 = models.FileField('Лого 16x16',upload_to=content_file_name_logo,blank=True, null=True)
     creator_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='Создатель школы')
     def __str__(self):
         return "%s" % (self.school_name)
@@ -67,8 +78,8 @@ class Comment(models.Model):
 class Course(models.Model):
     title = models.CharField('Название',max_length=20)
     cost = models.IntegerField('Стоимость',default=0,help_text='в тенге')
-    poster = models.FileField('Постер',upload_to='course',blank=True, null=True)
-    mini_poster = models.FileField('Мини Постер',upload_to='course',blank=True, null=True)
+    poster = models.FileField('Постер',upload_to=content_file_name_courses,blank=True, null=True)
+    mini_poster = models.FileField('Мини Постер',upload_to=content_file_name_courses,blank=True, null=True)
     short_desc = models.TextField('Короткое описание',max_length=200,blank=True, null=True)
     full_desc = models.TextField('Полное описание',max_length=500,blank=True, null=True)
     lesson_count = models.IntegerField('Количество уроков',default=0,blank=True, null=True)
@@ -97,10 +108,12 @@ class Lesson(models.Model):
     short_desc = models.TextField('Короткое описание',max_length=200,blank=True, null=True)
     full_desc = models.TextField('Полное описание',max_length=500,blank=True, null=True)
     files = models.FileField('Содержание урока',upload_to='lessons',blank=True, null=True)
+    video = models.FileField('Содержание урока',upload_to='lessons',blank=True, null=True)
     duration = models.IntegerField('Длителность',default=0,help_text='в минутах',blank=True, null=True)
     pub_date = models.DateField('Дата публикации',default= datetime.date.today,blank=True)
     course_id = models.ForeignKey('Course',on_delete=models.SET_NULL,blank=True,null=True,help_text='курс')
     teacher_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='Учитель курса')
+    checked = models.BooleanField(_("Проверено?"),blank=True,null=True)
     # comments = GenericRelation(Comment)
     def __str__(self):
         return "%s" % (self.title)
@@ -108,7 +121,7 @@ class Lesson(models.Model):
 class HomeWork(models.Model):
     title = models.CharField('Название',max_length=20,default="",blank=True, null=True)
     desc = models.TextField('Короткое описание',max_length=200,blank=True, null=True)
-    files = models.FileField('Содержание ДЗ',upload_to='lessons',blank=True, null=True)
+    files = models.FileField('Содержание ДЗ',storage=FileSystemStorage(location='hw'),blank=True, null=True)
     pub_date = models.DateField('Дата публикации',default= datetime.date.today,blank=True)
     lesson_id = models.ForeignKey('Lesson',on_delete=models.SET_NULL,blank=True,null=True,help_text='урок')
     course_id = models.ForeignKey('Course',on_delete=models.SET_NULL,blank=True,null=True,help_text='курс')
@@ -119,12 +132,11 @@ class HomeWork(models.Model):
        return self.title
 
 class KnowledgeBase(models.Model):
-    files = models.FileField('Файлы',upload_to='knowledgebase',blank=True, null=True)
+    files = models.FileField('Файлы',upload_to=content_file_name_knowledge,blank=True, null=True)
     pub_date = models.DateField('Дата публикации',default= datetime.date.today,blank=True)
     lesson_id = models.ForeignKey('Lesson',on_delete=models.SET_NULL,blank=True,null=True,help_text='урок')
     course_id = models.ForeignKey('Course',on_delete=models.SET_NULL,blank=True,null=True,help_text='курс')
-    def __str__(self):
-        return "%s" % (self.title)
+    
 
 class Vector(models.Model):
     title = models.CharField('Название',max_length=20)

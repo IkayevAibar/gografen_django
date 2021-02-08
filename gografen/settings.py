@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django_hosts',
     'landing',
+    'corsheader',
     # 'comment',
 ]
 
@@ -66,6 +67,7 @@ SITE_ID = 2
 MIDDLEWARE = [
     'django_hosts.middleware.HostsRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -107,7 +109,7 @@ WSGI_APPLICATION = 'gografen.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'grafen',
+        'NAME': 'gografen',
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': '127.0.0.1',

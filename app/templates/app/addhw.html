@@ -1,0 +1,95 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+            <form action="" method="post" class="card text-center" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% comment %} {{form}} {% endcomment %}
+                <label for="id_title">Название:</label>
+                <input type="text" name="title" maxlength="20" id="id_title"
+                {% if hw %}
+                    value="{{hw.title}}"
+                {% endif %}
+                >
+                <label for="id_desc">Короткое описание:</label>
+                <textarea name="desc" cols="40" rows="10" maxlength="200" id="id_desc">{{hw.desc}}</textarea>
+                <label for="id_files">Содержание ДЗ:</label>
+                <input type="file" name="files" id="id_files">
+                {% comment %} <input type="text" class="form-control " name="lesson_id" id="inputName" placeholder="" value="{{l_id.id}}"> {% endcomment %}
+                    {{date}}
+                <div class="form-group">
+                    <label for="">Курс</label>
+                    <select class="custom-select" name="course_id" id="course_id">
+                        <option selected>Выберете курс из списка</option>
+                        {% for key,value in dict.items %}
+                            <option value="{{key.id}}">{{key.title}}|{{value}}</option>
+                            
+                        {% endfor %}
+                        
+                    </select>
+                    {% for key,value in dict.items %}
+                        <div class="form-group">
+                            <label for="">Урок</label>
+                            <select class="form-control" name="lesson_id" id="lesson_id">
+                            <option selected>Выберете из списка</option>
+                        {% for lesson in value %}
+                                <option value="{{lesson.id}}">{{lesson.title}}</option>
+                        {% endfor %}
+                        </select>
+                        </div>
+                    {% endfor %}
+                    
+                </div>
+                
+                
+                <input type="text" class="form-control d-none" name="student_id" id="inputName" placeholder="" value="{{user.id}}">
+                <hr>
+                <button type="submit" class="btn btn-primary">Отправить</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="test">
+
+</div>
+{% comment %} {{dict}} {% endcomment %}
+
+<script>
+    {% comment %} let cities_by_country = {{ dict | jsonify }}; {% endcomment %}
+    let array_ = []
+    {% comment %} {% for key,value in dict.items %}
+        cities_by_country[{{key}}] = {{value}}
+    {% endfor %} {% endcomment %}
+    console.log(cities_by_country)
+    let coun = document.querySelector("#course_id");
+    let city = document.querySelector("#lesson_id");
+    document.querySelector("#test").innerHTML=cities_by_country
+    var added = false;
+    function c(){
+        if(added==true){
+            for (var index = city.length; index > 0; index--) {
+                city[index]=null;
+            }
+        }
+        for (let index2 = 0; index2 < countries.length; index2++) {
+            const element = countries[index2];
+            
+            if(coun.value == element){
+                for (var index = 0; index < cities_by_country[element].length; index++) {
+                    var s = document.createElement('option');
+                    s.append(cities_by_country[element][index]);
+                    city.append(s);
+                    added = true;
+
+                }
+        
+            }
+        }
+    }
+        document.querySelector('lesson_id').addEventListener('click',c);
+</script>
+
+{% endblock %}

@@ -63,14 +63,15 @@
                         Учебные курсы
                     </a>
                 </li>
-                {% endif %}
+                {% else %}
                 <li>
                     <a href="{% url 'mycourses' %}">
                         Мои курсы
                     </a>
                 </li>
+                {% endif %}
                 <li>
-                    <a href="#">
+                    <a href="{% url 'allhw' %}">
                         Задания
                     </a>
                 </li>
@@ -80,7 +81,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="{% url 'allcomments' %}">
                         Комментарии
                     </a>
                 </li>

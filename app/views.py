@@ -5,7 +5,7 @@ from django.utils import timezone
 from .serializers import GetappUserSerializer,GetappUserPublicSerializer,CreateappUserSerializer
 # from rest_framework.generics import RetrieveAPIView,UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
-from .models import Course_user, Vector, appUser,Course,Lesson,School
+from .models import Course_user, KnowledgeBase, Vector, appUser,Course,Lesson,School
 from rest_framework import permissions 
 from django.core.exceptions import ValidationError
 from django import forms
@@ -36,6 +36,8 @@ from django.urls import reverse
 from app.forms import *
 from gografen.settings import MEDIA_ROOT
 from rest_framework.authtoken.models import Token
+import vimeo
+
 # from django.contrib.auth.mixins import UserPassesTestMixin
 # from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -424,6 +426,7 @@ def addrole(request):
         counter=0
         p = Permission.objects.all().exclude(name="Can change session").exclude(name="Can add session").exclude(name="Can delete session").exclude(name="Can view session").exclude(name="Can change content type").exclude(name="Can add content type").exclude(name="Can delete content type").exclude(name="Can view content type").exclude(name="Can change log entry").exclude(name="Can add log entry").exclude(name="Can delete log entry").exclude(name="Can view log entry").exclude(name="Can delete site").exclude(name="Can view site").exclude(name="Can change site").exclude(name="Can add site")
         count = {}
+        # print(p)
         for pp in p:
             count[counter]=pp
             counter+=1
@@ -483,7 +486,7 @@ def roles(request):
                 if(user.has_group(gr)):
                     count+=1
             g_c[gr]=count
-        print(g_c)
+        # print(g_c)
         assert isinstance(request, HttpRequest)
         return render(
             request,
@@ -591,7 +594,6 @@ def catalog(request):
         courses = Course.objects.all()
         list_=[]
         for course in courses:
-            print(course.creator_id.school_id)
             if(request.user.school_id == course.creator_id.school_id):
                 list_.append(course)
         for c in list_:
@@ -607,7 +609,7 @@ def catalog(request):
                 'message':'Your application description page.',
                 'year':datetime.now().year,
                 'school':school,
-                'courses':courses,
+                'courses':list_,
             }
         )
     else:
@@ -692,25 +694,55 @@ def addvector(request):
   
 
 @login_required
-def homework(request,id):
+def homework(request,id,l_id):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
     if(sub_domain != "localhost:8000"):
-        course = Course.objects.filter(id=id)
+        course = Course.objects.filter(id=id).first()
         access = Course_user.objects.filter(course_id=course,student_id=request.user)
+        is_sent = HomeWork.objects.filter(student_id=request.user,course_id=course,lesson_id=Lesson.objects.filter(id=l_id).first())
+        print(is_sent)
+        if(is_sent.count()>0):
+            return redirect('lesson',id,l_id)
         if(request.user.school_id != course.creator_id.school_id):
             return HttpResponseNotFound('<h1>Page not found</h1>')
-        
+        if(request.method=="POST"):
+            form = HomeworkAddForm(request.POST)
+            if form.is_valid():
+                # print(form.data)
+                form.save()
+                return redirect('lesson',id,l_id)
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/addhomework.html',
+                    {
+                        'title':'Adding Course',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school':school,
+                        'form':form,
+                        'c_id':id,
+                        'l_id':Lesson.objects.filter(id=l_id).first()
+                    }
+                )
+        else:
+            form = HomeworkAddForm()
+
 
         assert isinstance(request, HttpRequest)
         return render(
             request,
-            'app/homework.html',
+            'app/addhomework.html',
             {
-                'title':'Course ',
+                'title':'homework ',
                 'message':'Your application description page.',
                 'year':datetime.now().year,
                 'school': school,
+                'form':form,
+                'c_id':id,
+                'l_id':Lesson.objects.filter(id=l_id).first()
             }
         )
     else:
@@ -768,50 +800,6 @@ def edithomework(request,id):
     else:
         return redirect('main')
 
-
-@permission_required('app.add_course')
-def addhomework(request):
-    school = School.objects.filter(id=request.user.school_id.id)[0]
-    sub_domain = request.get_host().split('.')[0]
-    if(sub_domain != "localhost:8000"):
-        
-        if request.method == 'POST':
-            form = VectorAddForm(request.POST)
-            if form.is_valid():
-                print(form.data)
-                form.save()
-                return redirect('vectors')
-            else:
-                assert isinstance(request, HttpRequest)
-                return render(
-                    request,
-                    'app/addhomework.html',
-                    {
-                        'title':'Adding Course',
-                        'message':'Your application description page.',
-                        'year':datetime.now().year,
-                        'school':school,
-                        'form':form,
-                    }
-                )
-        else:
-            form = VectorAddForm()
-        """Renders the catalog page."""
-        assert isinstance(request, HttpRequest)
-        return render(
-            request,
-            'app/addhomework.html',
-            {
-                'title':'Adding Course',
-                'message':'Your application description page.',
-                'year':datetime.now().year,
-                'school':school,
-                'form':form,
-            }
-        )
-    else:
-        return redirect('main')
-  
 
 @login_required
 def vector(request,id):
@@ -899,9 +887,10 @@ def courses(request):
         courses = Course.objects.all()
         list_=[]
         for course in courses:
-            print(course.creator_id.school_id)
+            # print(course.creator_id.school_id)
             if(request.user.school_id == course.creator_id.school_id):
-                list_.append(course)
+                if(course.creator_id == request.user or course.creator_id.school_id.creator_id == request.user):
+                    list_.append(course)
         for c in list_:
             c.update_num_lessons()
             c.update_duration()
@@ -964,16 +953,17 @@ def course(request,id):
     if(sub_domain != "localhost:8000"):
         course = Course.objects.filter(id=id)
         access = Course_user.objects.filter(course_id=id,student_id=request.user).first()
-        print(access)
         lessons = Lesson.objects.filter(course_id=course[0])
         if(request.user.school_id != course[0].creator_id.school_id):
             return HttpResponseNotFound('<h1>Page not found</h1>')
         """Renders the courses page."""
-        print(request.method)
         if request.method == 'POST':
             form = CommentAddForm(request.POST)
-            print(form)
-            if form.is_valid():
+            if(form.data.get('edit')):
+                comment = Comment.objects.filter(id=int(form.data.get('edit'))).first()
+                comment.content=form.data.get('content')
+                comment.save(update_fields=['content'])
+            elif form.is_valid():
                 form.save()
                 
                 return redirect('course',id)
@@ -1027,9 +1017,9 @@ def editcourse(request,id):
         """Renders the courses page."""
         print(request.method)
         if request.method == 'POST':
-            form = CourseAddForm(request.POST,request.FILES or None, instance=request.user)
+            form = CourseAddForm(request.POST,request.FILES, instance=request.user)
             if form.is_valid():
-                print("valid")
+                print(request.FILES)
                 # form.save()
                 course.title = form.data['title']
                 course.cost = form.data['cost']
@@ -1084,12 +1074,15 @@ def addcourse(request):
     sub_domain = request.get_host().split('.')[0]
     vectors= Vector.objects.filter()
     if(sub_domain != "localhost:8000"):
+        school_teachers = appUser.objects.filter(groups=(Group.objects.filter(name="Teacher")[0]),school_id=school.id)
+
         list_=[]
         for vector in vectors:
             if(request.user.school_id == vector.creator_id.school_id):
                 list_.append(vector)
+        
         if request.method == 'POST':
-            form = CourseAddForm(request.POST,request.FILES or None, instance=request.user)
+            form = CourseAddForm(request.POST,request.FILES, instance=request.user)
             if form.is_valid():
                 # form.save()
                 course = Course()
@@ -1100,10 +1093,22 @@ def addcourse(request):
                 course.short_desc = form.data['short_desc']
                 course.full_desc = form.data['full_desc']
                 course.end_date = form.data['end_date']
-                course.creator_id = request.user
+                course.creator_id = school_teachers.filter(id=form.data['creator_id']).first()
                 course.vector_id = vectors.filter(id=form.data['vector_id']).first()
                 course.save()
                 
+                # kb = KnowledgeBase.objects.create(
+                #     course_id = course,
+                #     files = request.FILES.get('poster', None)
+                # )
+
+                # kb2 = KnowledgeBase.objects.create(
+                #     course_id = course,
+                #     files = request.FILES.get('mini_poster', None)
+                # )
+
+                
+
                 return redirect('courses')
             else:
                 assert isinstance(request, HttpRequest)
@@ -1117,6 +1122,7 @@ def addcourse(request):
                         'school':school,
                         'form':form,
                         'vectors':list_,
+                        'teachers':school_teachers,
                     }
                 )
         else:
@@ -1133,6 +1139,7 @@ def addcourse(request):
                 'school':school,
                 'form':form,
                 'vectors':list_,
+                'teachers':school_teachers,
 
             }
         )
@@ -1206,11 +1213,15 @@ def deldcourse(request,id):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
     if(sub_domain != "localhost:8000"):
-        course = Course.objects.filter(id=id)
-        lessons = Lesson.objects.filter(course_id=course[0])
-        if(request.user.school_id != course[0].creator_id.school_id):
+        course = Course.objects.filter(id=id).first()
+        lessons = Lesson.objects.filter(course_id=course)
+        kb = KnowledgeBase.objects.filter(course_id = course , pub_date = course.pub_date ).first()
+        kb2 = KnowledgeBase.objects.filter(course_id = course , pub_date = course.pub_date ).first()
+        if(request.user.school_id != course.creator_id.school_id):
             return redirect('courses')
         
+        kb.delete()
+        kb2.delete()
         course.delete()
         if(lessons.count()>0):
             for lesson in lessons:
@@ -1227,7 +1238,9 @@ def lesson(request,id,l_id):
     sub_domain = request.get_host().split('.')[0]
     if(sub_domain != "localhost:8000"):
         lesson = Lesson.objects.filter(id=l_id)
-
+        lessons = Lesson.objects.filter(course_id=lesson[0].course_id)
+        is_sent = HomeWork.objects.filter(student_id=request.user,course_id=Course.objects.filter(id=id).first(),lesson_id=Lesson.objects.filter(id=l_id).first())
+        
         if(request.user.school_id != lesson[0].course_id.creator_id.school_id):
             return redirect('courses')
         
@@ -1235,10 +1248,7 @@ def lesson(request,id,l_id):
         l = request.user.groups.values_list('name',flat = True).first()
         if(access.count()<1 and l!='MainTeacher' and l!='Teacher'):
             return redirect('course',id)
-        if(request.method=='POST'):
-            form = HomeworkAddForm()
-        else:
-            form = HomeworkAddForm()
+        
         assert isinstance(request, HttpRequest)
         return render(
             request,
@@ -1248,9 +1258,11 @@ def lesson(request,id,l_id):
                 'message':'Your application description page.',
                 'year':datetime.now().year,
                 'school': school,
-                'c_id':id,
-                'form':form,
+                'c_id':lesson[0].course_id,
                 'lesson':lesson[0],
+                'lessons':lessons,
+                'access' : access,
+                'is_sent':is_sent
             }
         )
     else:
@@ -1353,13 +1365,21 @@ def addlesson(request,id):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
     school_teachers = appUser.objects.filter(groups=(Group.objects.filter(name="Teacher")[0]),school_id=school.id)
+    v = vimeo.VimeoClient(token='35420b200bb4b36c2323ba71f3b95352',
+                            key='b3fd03bb2e3ec1a808cbbf0a2eba71179e6309a2',
+                            secret='VBdIoArUuMZlte7jj0OvznNqVQuHFoBFJJ1NvbDwnWc44Fjls2xOBRCa4rY0PcCS+9Qa3VXA+jdXJ+MRPQKsW1JHZLV+9jlk0sb51qUvpjvxz5vp2eIZrtFIymDPUWwe'
+                            )
+    
     if(sub_domain != "localhost:8000"):
         print(request.method)
         if(request.method == 'POST'):
             form = LessonAddForm(request.POST,request.FILES or None)
             print(form.data)
             if form.is_valid():
-                form.save()
+                print(request.FILES)
+                lesson = form.save()
+                # print(lesson.video.path)
+                # v.upload(lesson.video.path)
                 return redirect('course',id)
             else:
                 assert isinstance(request, HttpRequest)
@@ -1499,4 +1519,245 @@ def deldrole(request,id):
         return redirect('roles')
     else:
         return redirect('main')
-  
+
+
+@login_required
+def allcomments(request):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        list_ = []
+        comments = Comment.objects.all()
+        if(comments.count()>0):
+            for c in comments:
+                print(c.user_id)
+                if(c!=None):
+                    if(c.user_id.school_id==request.user.school_id):
+                        if(c.course_id.creator_id.school_id.creator_id == request.user):
+                            list_.append(c)
+                        elif(c.course_id.creator_id == request.user):
+                            list_.append(c)
+                        elif(c.user_id == request.user):
+                            list_.append(c)
+
+
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/allcomments.html',
+            {
+                'title':'Adding Lesson',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school':school,
+                'cc':list_,
+            }
+        )
+    else:
+        return redirect('main')
+
+@login_required
+def delcomment(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        comment = Comment.objects.filter(id=id).first()
+        if(request.user.school_id != comment.user_id.school_id):
+            return redirect('allcomments')
+        comment.delete()
+        assert isinstance(request, HttpRequest)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    else:
+        return redirect('main')
+
+@login_required
+def delhw(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        hws = HomeWork.objects.filter(student_id=request.user).first()  
+        if(request.user.school_id != hws.student_id.school_id):
+            return redirect('allhw')
+        hws.delete()
+        assert isinstance(request, HttpRequest)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    else:
+        return redirect('main')
+
+
+
+@permission_required('app.view_homework')
+def allhw(request):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        list_ = []
+        hws = HomeWork.objects.filter(student_id=request.user)
+        l = request.user.groups.values_list('name',flat = True).first()
+        hwd = HomeWork.objects.all()
+        if(l=='MainTeacher'):
+            for hw in hwd:
+                if hw.course_id.creator_id.school_id == request.user.school_id:
+                    list_.append(hw)
+        else:
+            for hw in hwd:
+                print(hw.course_id.creator_id == request.user)
+                if hw.course_id.creator_id == request.user:
+                    list_.append(hw)
+        if(len(list_)>0):
+            hws=list_
+
+
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/myhws.html',
+            {
+                'title':'Adding Lesson',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school':school,
+                'hws':hws
+            }
+        )
+    else:
+        return redirect('main')
+
+@login_required
+def hw(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        hws = HomeWork.objects.filter(id=id).first()     
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/homework.html',
+            {
+                'title':'Adding Lesson',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school':school,
+                'hw':hws,
+            }
+        )
+    else:
+        return redirect('main')
+
+
+
+@login_required
+def edithw(request,id):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        hws = HomeWork.objects.filter(student_id=request.user,id=id).first()    
+         
+        if(request.method=="POST"):
+            form = HomeworkAddForm(request.POST)
+            if form.is_valid():
+                print(form.data)
+                # form.save()
+                hws.title = form.data.get('title')
+                hws.desc = form.data.get('desc')
+                hws.files = form.data.get('files')
+                hws.save(update_fields=["title","desc","files"])
+                return redirect('allhw')
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/addhomework.html',
+                    {
+                        'title':'Adding Course',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school':school,
+                        'form':form,
+                        'c_id':hws.course_id.id,
+                        'l_id':Lesson.objects.filter(id=hws.lesson_id.id).first()
+                    }
+                )
+        else:
+            form = HomeworkAddForm()
+
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/addhomework.html',
+            {
+                'title':'Adding Lesson',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school':school,
+                'hw':hws,
+                'form':form,
+                'c_id':hws.course_id.id,
+                'l_id':Lesson.objects.filter(id=hws.lesson_id.id).first()
+            }
+        )
+    else:
+        return redirect('main')
+
+@login_required
+def addhw(request):
+    school = School.objects.filter(id=request.user.school_id.id)[0]
+    sub_domain = request.get_host().split('.')[0]
+    if(sub_domain != "localhost:8000"):
+        access = Course_user.objects.filter(student_id=request.user)
+        list_=[]
+        list2 = []
+        dict_ = {}
+        for cu in access:
+            course = Course.objects.filter(id=cu.course_id.id).first()
+            list_.append(course)
+            lessons = Lesson.objects.filter(course_id=course.id)
+            for l in lessons:
+                list2.append(l)
+            dict_[course] = list2
+            list2=[]
+        
+        
+        # if(request.user.school_id != course.creator_id.school_id):
+        #     return HttpResponseNotFound('<h1>Page not found</h1>')
+        if(request.method=="POST"):
+            form = HomeworkAddForm(request.POST)
+            if form.is_valid():
+                # print(request.FILES['files'])
+                form.save()
+                return redirect('allhw')
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/addhw.html',
+                    {
+                        'title':'Adding Course',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'school':school,
+                        'form':form,
+                        'list':list_,
+                        'dict':dict_
+                    }
+                )
+        else:
+            form = HomeworkAddForm()
+
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/addhw.html',
+            {
+                'title':'homework ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'school': school,
+                'form':form,
+                'list':list_,
+                'dict':dict_,
+            }
+        )
+    else:
+        return redirect('main')
+

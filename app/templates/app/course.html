@@ -3,6 +3,12 @@
 {% block content %}
 
 <div class="container-fluid">
+{% if user.id == course.creator_id.id or user.id == course.creator_id.school_id.creator_id.id %}
+    <a name="" id="" class="btn btn-primary" href=" {% url 'courses' %}" role="button">Back</a>
+{% else %}
+    <a name="" id="" class="btn btn-primary" href=" {% url 'mycourses' %}" role="button">Back</a>
+{% endif %}
+
     <div class="row">
         <div class="col-md-9">
             <div class="card text-center">
@@ -15,7 +21,7 @@
                 </div>
                 {% with lessons|first as first %}
                     {% if first %}
-                        {% if access %}
+                        {% if access or user.id == course.creator_id.id or user.id == course.creator_id.school_id.creator_id.id %}
                             <a name="" id="" class="btn btn-primary" href="{% url 'lesson' course.id first.id %}" role="button">Начать</a>
                         {% else %}
                             <a name="" id="" class="btn btn-info" href="" role="button">Купить за {{course.cost}} тг</a>
@@ -38,11 +44,43 @@
                 <div class="coment-bottom bg-white p-2 px-4">
                     <div class="commented-section mt-2">
                         <div class="d-flex flex-row align-items-center commented-user">
-                            <h5 class="mr-2">{{c.user_id.username}}</h5><span class="dot mb-1"></span><span class="mb-1 ml-2">{{c.pub_date}}</span>
+                            <h5 class="mr-2">{{c.user_id.username}}</h5><span class="dot mb-1"></span>
+                            <span class="mb-1 ml-2">{{c.pub_date}}</span>
+                            {% if c.user_id == user %}
+                                <span class="mb-1 ml-5">
+                                <a href="" type="button" class="btn btn-sm btn-outline-primary " data-href="delete.php?id=23" data-toggle="modal" data-target="#confirm-delete-{{forloop.counter}}">Изменить</a>
+                                <a href="{% url 'delcomment' c.id %}" class="btn btn-danger btn-ok btn-sm">Удалить</a>
+                                <div class="modal fade" id="confirm-delete-{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                Коммент от {{c.user_id}} | {{c.course_id.title}}
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="" method="POST">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control d-none" name="edit" id="edit" value="{{c.id}}" placeholder="">
+                                                </div>
+                                                <div class="form-group">
+                                                <textarea class="form-control" name="content" id="id_content" rows="3">{{c.content}}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                                                <button type="submit" class="btn btn-primary">Изменить</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </span>
+                            {% endif %}
                         </div>
                         <div class="comment-text-sm"><span>{{c.content}}</span></div>
                     </div>
                 </div>
+                
             {% endfor %}
         </div>
         <div class="col-md-3">
@@ -50,16 +88,14 @@
                 Уроки:
                 {% for perm in user.get_group_permissions  %}
                     {% if perm == 'app.add_lesson' %}
-                    <a name="" id="" class="btn btn-primary ml-auto flex-row-reverse" href="add" role="button">Добавить</a>
+                        <a name="" id="" class="btn btn-primary ml-auto flex-row-reverse" href="{% url 'addlesson' course.id %}" role="button">Добавить</a>
                     {% endif %}
                 {% endfor %}
-                
-
             </div>
             <div class="list-group">
                 {% for l in lessons %}
                     <a 
-                    {% if access or user.id == course.creator_id.id %}
+                    {% if access or user.id == course.creator_id.id or user.id == course.creator_id.school_id.creator_id.id  %}
                         href="{% url 'lesson' course.id l.id %}" 
                     {% else %}
                         href="" 
@@ -67,7 +103,7 @@
                     class="list-group-item list-group-item-action flex-column align-items-start">
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">{{l.title}}</h5>
-                            <small>{{l.id}}</small>
+                            <small>{{forloop.counter}}</small>
                         </div>
                         <p class="mb-1">{{l.duration}} мин</p>
                         <small>{{l.short_desc}}</small>

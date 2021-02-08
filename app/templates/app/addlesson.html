@@ -7,10 +7,9 @@
 <div class="row">
     <div class="col-md-8">
         <section id="addForm">
-            <form action="http://factory.localhost:8000/courses/1/add" method="post" class="form-horizontal">
+            <form action="" method="post" class="form-horizontal" enctype="multipart/form-data">
                 {% csrf_token %}
                 <hr />
-                
                 {{form.errors}}
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-8">
@@ -26,6 +25,14 @@
                             </div>
                             <div class="custom-file">
                                 <input type="file" class="form-control"    id="id_files" name="files" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
+                            </div>
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-preend">
+                                <span class="input-group-text" for="id_files">Video</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="form-control"    id="id_video" name="video" required="" aria-describedby="inputGroupFileAddon01" data-show-preview="truncatechars">
                             </div>
                         </div>
                         <div class="input-group input-group-sm mb-3">
@@ -55,8 +62,6 @@
                             {% for teacher in teachers %}
                                 <option value="{{teacher.id}}">{{teacher}}</option>
                             {% endfor %}
-                            
-
                     </select>
                 </div>
                 <hr />
