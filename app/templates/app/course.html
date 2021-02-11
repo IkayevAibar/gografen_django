@@ -46,6 +46,7 @@
                         <div class="d-flex flex-row align-items-center commented-user">
                             <h5 class="mr-2">{{c.user_id.username}}</h5><span class="dot mb-1"></span>
                             <span class="mb-1 ml-2">{{c.pub_date}}</span>
+                            <span class="mb-1 ml-2">{% if c.change_date %} изменён в {{c.change_date}} {% endif %} </span>
                             {% if c.user_id == user %}
                                 <span class="mb-1 ml-5">
                                 <a href="" type="button" class="btn btn-sm btn-outline-primary " data-href="delete.php?id=23" data-toggle="modal" data-target="#confirm-delete-{{forloop.counter}}">Изменить</a>
@@ -63,7 +64,7 @@
                                                     <input type="text" class="form-control d-none" name="edit" id="edit" value="{{c.id}}" placeholder="">
                                                 </div>
                                                 <div class="form-group">
-                                                <textarea class="form-control" name="content" id="id_content" rows="3">{{c.content}}</textarea>
+                                                    <textarea class="form-control" name="content" id="id_content" rows="3">{{c.content}}</textarea>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">

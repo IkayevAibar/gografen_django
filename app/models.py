@@ -71,6 +71,7 @@ class Comment(models.Model):
     user_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='Комментатор')
     course_id = models.ForeignKey('Course',on_delete=models.SET_NULL,blank=True,null=True,help_text='Курс')
     pub_date = models.DateTimeField('Дата публикации',default= timezone.now)
+    change_date = models.DateTimeField('Дата изменении',blank=True,null=True)
     content = models.CharField('Контент',max_length=220,null=True,blank=True)
     def __str__(self):
         return "%s(%s):'%s'" % (self.user_id,self.course_id,self.content)
@@ -113,7 +114,6 @@ class Lesson(models.Model):
     pub_date = models.DateField('Дата публикации',default= datetime.date.today,blank=True)
     course_id = models.ForeignKey('Course',on_delete=models.SET_NULL,blank=True,null=True,help_text='курс')
     teacher_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='Учитель курса')
-    checked = models.BooleanField(_("Проверено?"),blank=True,null=True)
     # comments = GenericRelation(Comment)
     def __str__(self):
         return "%s" % (self.title)
@@ -126,6 +126,8 @@ class HomeWork(models.Model):
     lesson_id = models.ForeignKey('Lesson',on_delete=models.SET_NULL,blank=True,null=True,help_text='урок')
     course_id = models.ForeignKey('Course',on_delete=models.SET_NULL,blank=True,null=True,help_text='курс')
     student_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='Ученик курса')
+    checked = models.BooleanField(_("Проверено?"),default=False,blank=True,null=True)
+
     def __str__(self):
         return "%s" % (self.title)
     def __unicode__(self):

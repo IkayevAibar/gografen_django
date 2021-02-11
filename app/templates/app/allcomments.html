@@ -8,7 +8,8 @@
             <th>Отправитель</th>
             <th>Курс</th>
             <th>Коммент</th>
-            <th>Время</th>
+            <th>Время отправления</th>
+            <th>Время изменения</th>
             <th>Действие</th>
         </tr>
     </thead>
@@ -16,9 +17,15 @@
 {% for c in cc %}
         <tr>
             <td scope="row">{{c.user_id}}</td>
-            <td>{{c.course_id.title}}</td>
-            <td>{{c.content}}</td>
+            <td><a href="{% url 'course' c.course_id.id %}">
+                    {{c.course_id.title}}
+                    </a>
+            </td>
+            <td>
+            {{c.content}}</td>
             <td>{{c.pub_date}}</td>
+            <td>{{c.change_date}}</td>
+            
             <td>
                 <a href="" type="button" class="btn btn-sm btn-outline-primary" data-href="delete.php?id=23" data-toggle="modal" data-target="#confirm-delete-{{forloop.counter}}">Действие</a>
             </td>
@@ -33,13 +40,43 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-                            <a name="" id="" class="btn btn-primary" href="#" role="button">Изменить</a>
+                            {% comment %} <a name="" id="" class="btn btn-primary" href="#" role="button"></a> {% endcomment %}
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal-{{forloop.counter}}" >Изменить</button>
+
+                            
                             <a href="{% url 'delcomment' c.id %}" class="btn btn-danger btn-ok">Удалить</a>
                         </div>
                     </div>
                 </div>
             </div>
         </tr>
+        <div class="modal fade" id="exampleModal-{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Новый коммент</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input type="text" class="form-control d-none" name="edit" id="edit" value="{{c.id}}" placeholder="">
+                                <label for="message-text" class="col-form-label">Коммент:</label>
+                                <textarea class="form-control" id="message-text" name="content">{{c.content}}</textarea>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary">Изменить</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
 {% endfor %}
     </tbody>
 </table>

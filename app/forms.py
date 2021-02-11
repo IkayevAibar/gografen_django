@@ -74,10 +74,6 @@ class GroupChangeForm(forms.ModelForm):
         fields = ('name','description','permissions')
  
 class appUserAddingForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30,error_messages={'name_length':"Слишком длинное имя"})
-    last_name = forms.CharField(max_length=30)
-    email = forms.EmailField(error_messages={'email_exists':'Email exists'})
-    phone = forms.CharField(max_length=20)
     role = forms.CharField(max_length=30)
 
     class Meta:

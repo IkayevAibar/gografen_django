@@ -5,10 +5,10 @@
   <div class="card-header">
     <ul class="nav nav-tabs card-header-tabs">
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'users' %}">Users</a>
+        <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link active" href="{% url 'roles' %}">Roles</a>
+        <a class="nav-link active" href="{% url 'roles' %}">Роли</a>
       </li>
     </ul>
   </div>
@@ -22,7 +22,7 @@
                     <th>Описание</th>
                     <th>Пользователей</th>
                     {% comment %} <th>action</th> {% endcomment %}
-                    <th>action</th>
+                    <th>Удалить</th>
                     {% for perm in user.get_group_permissions  %}
                         {% if perm == 'auth.add_group' %}
                         <th>

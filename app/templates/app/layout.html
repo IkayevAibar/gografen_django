@@ -42,11 +42,13 @@
                 <strong>GG</strong>
             </div>
             <ul class="list-unstyled components">
+                {% if user.groups.all.0.name != 'Student' and user.is_authenticated %}
                 <li class="active">
                     <a href="{% url 'home' %}">
                         Главная
                     </a>
                 </li>
+                {% endif %}
                 <li>
                     <a href="{% url 'catalog' %}">
                         Каталог
@@ -116,7 +118,9 @@
             <ul class="list-unstyled CTAs">
                 <footer>
                     {% if user.is_authenticated %}
-                        &copy; {{ year }} -  {{ school.school_name }}
+                        &copy; {{ year }} -  {{ school.school_name }} 
+                        <hr>
+                        <a href="https://gografen.com">GoGrafen</a>
                     {% else %}
                         &copy; {{ year }} - Gografen
                     {% endif %}

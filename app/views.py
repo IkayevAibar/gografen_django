@@ -33,7 +33,7 @@ from django.dispatch import receiver
 from django.template import Context
 from django.contrib.sites.models import Site
 from django.urls import reverse
-from app.forms import *
+from .forms import *
 from gografen.settings import MEDIA_ROOT
 from rest_framework.authtoken.models import Token
 import vimeo
@@ -88,13 +88,73 @@ def home(request):
         school = School.objects.filter(sub_domen=request.user.school_id.sub_domen)[0]
         if(sub_domain != "localhost:8000"):
             """Renders the home page."""
+            start_date = None
+            end_date = None
+            if(request.GET.get('date1') and request.GET.get('date2')):
+                start_date=request.GET['date1']
+                end_date=request.GET['date2']
+                
+            list_=[]
+            revenue=0
+            access_count=0
+            if(start_date and end_date):
+                all_accesses = Course_user.objects.filter(start_date__range=(start_date, end_date))
+            else:
+                all_accesses = Course_user.objects.all()
+            for item in all_accesses:
+                if(item.course_id.creator_id.school_id == request.user.school_id):
+                    access_count+=1
+                    c = Course.objects.filter(id=item.course_id.id).first()
+                    revenue+= c.cost
+        
+            comments = Comment.objects.order_by('-pub_date')
+            if(comments.count()>0):
+                for c in comments:
+                    print(c.user_id)
+                    if(c!=None):
+                        if(c.user_id.school_id==request.user.school_id):
+                            if(c.course_id.creator_id.school_id.creator_id == request.user):
+                                list_.append(c)
+                            elif(c.course_id.creator_id == request.user):
+                                list_.append(c)
+                            elif(c.user_id == request.user):
+                                list_.append(c)
+
+            c_count = 0
+            if(start_date and end_date):
+                courses = Course.objects.filter(start_date__range=(start_date, end_date))
+            else:
+                courses = Course.objects.all()
+            for c in courses:
+                if(c.creator_id.school_id == request.user.school_id):
+                    c_count+=1
+            hwhw = []
+            hws = HomeWork.objects.filter(checked=False)
+            for hw in hws:
+                if hw.course_id.creator_id.school_id == request.user.school_id:
+                    hwhw.append(hw)
+            
+            if(start_date and end_date):
+                end_date= end_date+" 23:59:59"
+                students = appUser.objects.filter(school_id=request.user.school_id,client_activity__range=(start_date, end_date))
+            else:
+                students = appUser.objects.filter(school_id=request.user.school_id).exclude(client_activity=None)
+            # students = appUser.objects.filter()
             return render(
                 request,
                 'app/index.html',
                 {
                     'school':school,
+                    'revenue':revenue,
+                    'comments':list_,
+                    'course_count':c_count,
+                    'access_count':access_count,
                     'title':'Home Page',
                     'year':datetime.now().year,
+                    'hws':hwhw,
+                    'students_c':len(students),
+                    'start_date':start_date,
+                    'end_date':end_date,
                 }
             )
         else:
@@ -591,8 +651,29 @@ def catalog(request):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
     if(sub_domain != "localhost:8000"):
-        courses = Course.objects.all()
+        vector_g = None
+        if(request.GET.get('vector')):
+            vector_g=request.GET['vector']
+        start_date = None
+        end_date = None
+        if(request.GET.get('date1') and request.GET.get('date2')):
+            start_date=request.GET['date1']
+            end_date=request.GET['date2']
+        
+        vectors = Vector.objects.all()
+        list_v=[]
+        for v in vectors:
+            if(v.creator_id.school_id == request.user.school_id):
+                list_v.append(v)
         list_=[]
+        if(vector_g!='0' and vector_g!=None):
+            courses = Course.objects.filter(vector_id=vector_g)
+        else:
+            courses = Course.objects.all()
+        
+        if(start_date and end_date):
+            courses = courses.filter(start_date__range=(start_date, end_date))
+            
         for course in courses:
             if(request.user.school_id == course.creator_id.school_id):
                 list_.append(course)
@@ -610,6 +691,7 @@ def catalog(request):
                 'year':datetime.now().year,
                 'school':school,
                 'courses':list_,
+                'vectors':list_v,
             }
         )
     else:
@@ -962,7 +1044,8 @@ def course(request,id):
             if(form.data.get('edit')):
                 comment = Comment.objects.filter(id=int(form.data.get('edit'))).first()
                 comment.content=form.data.get('content')
-                comment.save(update_fields=['content'])
+                comment.change_date = timezone.now()
+                comment.save(update_fields=['content','change_date'])
             elif form.is_valid():
                 form.save()
                 
@@ -1539,6 +1622,16 @@ def allcomments(request):
                             list_.append(c)
                         elif(c.user_id == request.user):
                             list_.append(c)
+        
+        if request.method == 'POST':
+            form = CommentAddForm(request.POST)
+            if(form.data.get('edit')):
+                comment = comments.filter(id=int(form.data.get('edit'))).first()
+                comment.content=form.data.get('content')
+                comment.change_date = timezone.now()
+                comment.save(update_fields=['content','change_date'])
+
+            return redirect('allcomments')
 
 
         assert isinstance(request, HttpRequest)

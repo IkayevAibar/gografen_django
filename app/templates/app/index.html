@@ -2,4 +2,110 @@
 
 {% block content %}
 
+<div class="container">
+    <div id="toolbar">
+    <form class="form-inline">
+        <div class="form-group">
+            <span></span>
+            <input name="date1" class="form-control w70" type="date" >
+            </div>
+            <div class="form-group">
+            <span>-</span>
+            <input name="date2" class="form-control w70" type="date">
+            </div>
+            <button id="ok" type="submit" class="btn btn-primary"><i class="fa fa-arrow-down" aria-hidden="true"></i></button>
+        </div>
+    </form>
+    <hr>
+    <div class="row">
+        <div class="col-sm">
+            <div class="row card">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"> Доход: {{revenue}} тг</li>
+                    <li class="list-group-item">Активные студенты: {{students_c}}</li>
+                    <li class="list-group-item">Отплатившие студенты: {{access_count}}</li>
+                    <li class="list-group-item">
+                    <div class="row pl-3 d-flex align-items-center ">
+                        Добавленные курсы:  
+                        <form class="pl-2 " action="{% url 'catalog' %}">
+                                <input name="date1" class="form-control w70 d-none" type="date" value={{start_date}}>
+                                <input name="date2" class="form-control w70 d-none" type="date" value={{end_date}}>
+                                <button id="ok" type="submit" class="btn btn-secondary btn-sm">{{course_count}}</button>
+                        </form>
+                    </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="row card">
+                <div class="card-body">
+                    <h4 class="card-title">Новые комментарий:</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm ">
+                            Уроки:
+                        </div>
+                        <div class="col-sm ">
+                            Пользователь:
+                        </div>
+                    </div>
+                </div>
+                {% for c in comments|slice:":4" %}
+                    <div class="row pl-4">
+                        <div class="col-sm ">
+                            <a class="card-link" href="{% url 'course' c.course_id.id %}">
+                                        {{c.course_id.title}}
+                                    </a>
+                        </div>
+                        <div class="col-sm ">
+                            {{c.user_id.username}}
+                        </div>
+                    </div>
+                    
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="row card">
+                <div class="card-body">
+                    <h4 class="card-title">Активные студенты сейчас:</h4>
+                    <h6 class="card-title">0</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        Уроки:
+                    </div>
+                </div>
+            </div>
+            <div class="row card">
+                <div class="card-body">
+                    <h4 class="card-title">Непроверенные задания:</h4>
+                    <h6 class="card-title">{{hws|length}}</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm">
+                            Материал:
+                        </div>
+                        <div class="col-sm">
+                            Студент:
+                        </div>
+                    </div>
+                </div>
+                {% for hw in hws|slice:":4" %}
+                <div class="row pl-4">
+                    <div class="col-sm">
+                        <a href="{% url 'lesson' hw.lesson_id.course_id.id hw.lesson_id.id %}">
+                            {{hw.lesson_id.title}}
+                            </a>
+                    </div>
+                    <div class="col-sm">
+                        {{hw.student_id.username}}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

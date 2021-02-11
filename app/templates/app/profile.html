@@ -1,7 +1,6 @@
 {% extends "app/layout.html" %}
 
 {% block content %}
-    
 <div class="container padding">
     <div class="row justify-content-center">
         <div class="col-md-9">
@@ -20,53 +19,53 @@
                         <div class="col-2"></div>
                         <div class="col-8">
                             <div class="row">
-                                <label class="col-6" for="">Name</label>
+                                <label class="col-6" for="">Имя</label>
                                 <label class="col-6" for="">{{ user.first_name}}</label>
                             </div>
                             <div class="row">
-                                <label class="col-6" for="">Surname</label>
+                                <label class="col-6" for="">Фамилия</label>
                                 <label class="col-6" for="">{{ user.last_name}}</label>
                             </div>
                             <div class="row">
-                                <label class="col-6" for="">Fathername</label>
+                                <label class="col-6" for="">Отчество</label>
                                 <label class="col-6" for="">{{ user.fathername}}</label>
                             </div>
                             <div class="row">
-                                <label class="col-6" for="">E-mail</label>
+                                <label class="col-6" for="">Почта</label>
                                 <label class="col-6" for="">{{ user.email}}</label>
                             </div>
                             <div class="row">
-                                <label class="col-6" for="">Phone</label>
+                                <label class="col-6" for="">Телефон</label>
                                 <label class="col-6" for="">{{ user.phone}}</label>
                             </div>
                             <div class="row">
-                                <label class="col-6" for="">Gender</label>
+                                <label class="col-6" for="">Пол</label>
                                 {% if user.gender == 0 %}
-                                    <label class="col-6" for="">None</label>
+                                    <label class="col-6" for="">Нет</label>
                                 {% else %}
                                     {% if user.gender == 1 %}
-                                        <label class="col-6" for="">Male</label>
+                                        <label class="col-6" for="">Мужской</label>
                                     {% else %}
-                                        <label class="col-6" for="">Female</label>
+                                        <label class="col-6" for="">Женский</label>
                                     {% endif %}
                                 {% endif %}
                             </div>
                             <div class="row">
-                                <label class="col-6" for="">Country</label>
+                                <label class="col-6" for="">Страна</label>
                                 <label class="col-6" for="">{{ user.country}}</label>
                             </div>
                             <div class="row">
-                                <label class="col-6" for="">Date of Birth</label>
+                                <label class="col-6" for="">Дата рождение</label>
                                 <label class="col-6" for="">{{ user.birth_date}}</label>
                             </div>
                             <div class="row">
-                                <label class="col-6" for="">Account created</label>
+                                <label class="col-6" for="">Дата создание аккаунта</label>
                                 <label class="col-6" for="">{{ user.lead_activity}}</label>
                             </div>
                         </div>
                         <div class="col-2"></div>
                     </div>
-                    <a name="" id="" class="btn btn-info" href="{% url 'users' %}edit/{{user.id}}" role="button">Edit</a>
+                    <a name="" id="" class="btn btn-info" href="{% url 'users' %}edit/{{user.id}}" role="button">Изменить</a>
                     
                 </div>
             </div>

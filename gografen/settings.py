@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django_hosts',
     'landing',
-    'corsheader',
     # 'comment',
 ]
 

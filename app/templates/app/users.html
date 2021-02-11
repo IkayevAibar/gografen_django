@@ -5,10 +5,10 @@
   <div class="card-header">
     <ul class="nav nav-tabs card-header-tabs">
       <li class="nav-item">
-        <a class="nav-link active" href="{% url 'users' %}">Users</a>
+        <a class="nav-link active" href="{% url 'users' %}">Пользователи</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'roles' %}">Roles</a>
+        <a class="nav-link" href="{% url 'roles' %}">Роли</a>
       </li>
     </ul>
   </div>
@@ -18,18 +18,18 @@
             <thead class="thead-inverse">
                 <tr>
                     <th>ID</th>
-                    <th>username</th>
-                    <th>status</th>
-                    <th>active</th>
-                    <th>role</th>
+                    <th>Почта</th>
+                    <th>Активен</th>
+                    <th>Онлайн</th>
+                    <th>Роль</th>
                     {% for perm in user.get_group_permissions  %}
-                        {% if perm == 'app.delete_appuser' %}
-                            <th>action</th>
+                        {% if perm == 'app.change_appuser' %}
+                            <th>Изменить</th>
                         {% endif %}
                     {% endfor %}
                     {% for perm in user.get_group_permissions  %}
                         {% if perm == 'app.delete_appuser' %}
-                            <th>action</th>
+                            <th>Удалить</th>
                         {% endif %}
                     {% endfor %}
                     

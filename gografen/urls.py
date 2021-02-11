@@ -23,6 +23,7 @@ from gografen import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('',views.default,name="default"),
     path('admin/', admin.site.urls ,name='admin'),
     path('api-auth/', include('rest_framework.urls')),
     path('auth/', include('djoser.urls')),
