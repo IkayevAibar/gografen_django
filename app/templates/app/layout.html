@@ -44,58 +44,58 @@
             <ul class="list-unstyled components">
                 {% if user.groups.all.0.name != 'Student' and user.is_authenticated %}
                 <li class="active">
-                    <a href="{% url 'home' %}">
-                        Главная
+                    <a href="{% url 'home' %}" data-toggle="tooltip" data-placement="right" title="Главная">
+                        <as>Главная</as> <i class="fa fa-home" aria-hidden="true"></i>
                     </a>
                 </li>
                 {% endif %}
                 <li>
-                    <a href="{% url 'catalog' %}">
-                        Каталог
+                    <a href="{% url 'catalog' %}" data-toggle="tooltip" data-placement="right" title="Каталог">
+                        <as>Каталог</as> <i class="fa fa-shopping-bag" aria-hidden="true"></i>
                     </a>
                 </li>
                 {% if user.groups.all.0.name != 'Student' and user.is_authenticated %}
                 <li>
                     <a href="{% url 'users' %}">
-                        Пользователи
+                        <as>Пользователи</as> <i class="fas fa-users    "></i>
                     </a>
                 </li> 
                 <li>
                     <a href="{% url 'courses' %}">
-                        Учебные курсы
+                        <as>Учебные курсы</as> <i class="fa fa-book" aria-hidden="true"></i>
                     </a>
                 </li>
                 {% else %}
                 <li>
                     <a href="{% url 'mycourses' %}">
-                        Мои курсы
+                        <as>Мои курсы</as> <i class="fa fa-book" aria-hidden="true"></i>
                     </a>
                 </li>
                 {% endif %}
                 <li>
                     <a href="{% url 'allhw' %}">
-                        Задания
+                        <as>Задания</as> <i class="fa fa-envelope-open" aria-hidden="true"></i>
                     </a>
                 </li>
                 <li>
                     <a href="#">
-                        База Знаний
+                        <as>База Знаний</as> <i class="fa fa-database" aria-hidden="true"></i>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'allcomments' %}">
-                        Комментарии
+                        <as>Комментарии</as> <i class="fa fa-comments" aria-hidden="true"></i>
                     </a>
                 </li>
                 {% if user.groups.all.0.name != 'Student' and user.is_authenticated %}
                 <li>
                     <a href="#">
-                        Отчеты
+                        <as>Отчеты</as> <i class="fa fa-table" aria-hidden="true"></i>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'settings' %}">
-                        Настройки
+                        <as>Настройки</as> <i class="fa fa-cog" aria-hidden="true"></i>
                     </a>
                 </li>
                 {% comment %} <li>
@@ -183,9 +183,27 @@
                 $('#sidebar').toggleClass('active');
                 if( document.querySelector("#sidebarCollapse").getElementsByTagName("span")[0].innerHTML=="Открыть" ){
                     document.querySelector("#sidebarCollapse").getElementsByTagName("span")[0].innerHTML="Скрыть"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li.active > a").children[0].className=""
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(2) > a > as").className=""
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(3) > a > as").className=""
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(4) > a > as").className=""
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(5) > a > as").className=""
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(6) > a > as").className=""
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(7) > a > as").className=""
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(8) > a > as").className=""
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(9) > a > as").className=""
                 }
                 else{
                     document.querySelector("#sidebarCollapse").getElementsByTagName("span")[0].innerHTML="Открыть"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li.active > a").children[0].className="d-none"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(2) > a > as").className="d-none"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(3) > a > as").className="d-none"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(4) > a > as").className="d-none"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(5) > a > as").className="d-none"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(6) > a > as").className="d-none"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(7) > a > as").className="d-none"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(8) > a > as").className="d-none"
+                    document.querySelector("#sidebar > ul.list-unstyled.components > li:nth-child(9) > a > as").className="d-none"
                 }
             });
         });

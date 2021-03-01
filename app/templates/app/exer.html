@@ -1,0 +1,404 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+{{form.errors}}
+<div class="container">
+    <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+        <div class="col-sm-7">
+            <div class="form-group row">
+                <label for="">Выбирите шаблон:</label>
+                <select class="custom-select" name="title" id="id_title">
+                    <option value="0">Выберите из списка</option>
+                    <option name="title" value="Вставить слова в текст">1. Вставить слова в текст</option>
+                    <option name="title" value="Расставить слова в правильном порядке">2. Расставить слова в правильном порядке</option>
+                    <option name="title" value="Вычеркнуть лишнее слово">3. Вычеркнуть лишнее слово</option>
+                    <option name="title" value="Matching – соединить значения / 2 части предложения">4. Matching – соединить значения / 2 части предложения</option>
+                    <option name="title" value="Подписать картинку и расставить слова в правильном">5. Подписать картинку и расставить слова в правильном</option>
+                    <option name="title" value="Вписать ответ в таблицу">6. Вписать ответ в таблицу</option>
+                    <option name="title" value="Отметить правильные ответы и исправить не верные">7. Отметить правильные ответы и исправить не верные</option>
+                </select>
+            </div>
+            <div class="form-group row">
+                <label for="id_desc">Условие упражнение: </label> 
+                <textarea name="desc" class="form-control" cols="40" rows="2" maxlength="200" id="id_desc"></textarea>
+            </div>
+            <div class="form-group row">
+                <label class="col-12 pl-0" for="id_text">Текст для упражнения:</label> 
+                <textarea name="text" class="form-control" cols="40" rows="3" id="id_text"></textarea>
+            </div>
+            <input type="text" class="form-control d-none" name="creator_id" id="id_creator_id" placeholder="" value="{{user.id}}">
+            <input type="text" class="form-control d-none" name="ex_id" id="id_ex_id" placeholder="" value="{{e_id}}">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <script>
+    var ddl = document.getElementById("id_title");
+    function f_add_words(){
+        var text = document.getElementById("id_text")
+        var dd = document.querySelector("#content > div > form > div > div:nth-child(3)")
+        var dd3 = document.getElementById('all_rows')
+        var div = document.createElement('div')
+        
+        div.className="row ml-2"
+        div.id="words_row"
+        var input = document.createElement('input')
+        input.className="form-control col-3 mx-3"
+        input.name="first"
+        input.placeholder="Слово 1"
+        var input2 = document.createElement('input')
+        input2.className="form-control col-3 mx-3"
+        input2.name="second"
+        input2.placeholder="Слово 2"
+        text.className="d-none"
+        var i = document.createElement('i')
+        i.className="fa fa-times"
+        i.aria_hidden="true"
+        var button = document.createElement('button')
+        button.type="button"
+        button.id="button"
+        button.append(i)
+        button.addEventListener('click',function(e){
+            if(e.target && e.target.id=="button"){
+                e.target.parentElement.remove()
+            }
+            else if(e.target.tagName=="svg"){
+                e.target.parentElement.parentElement.remove()
+            }
+            else if(e.target.tagName=="path"){
+                e.target.parentElement.parentElement.parentElement.remove()
+            }
+        })
+        div.append(input)
+        div.append(input2)
+        div.append(button)
+        dd3.append(div)
+        input.addEventListener('change',asd)
+        input2.addEventListener('change',asd)
+    }
+    function validate(){
+        var selectedValue = ddl.options[ddl.selectedIndex].value;
+        var text = document.getElementById("id_text")
+        var words_row = document.getElementById("all_rows")
+        var add_words = document.getElementById("add_words")
+        var column_row = document.getElementById("column_row")
+        var add_input = document.getElementById("add_input")
+        var created_columns = document.getElementById('created_columns')
+
+        if (selectedValue == "Вставить слова в текст")
+        {
+            if(add_words){
+                add_words.parentNode.removeChild(add_words)}
+            if(words_row){
+                words_row.parentNode.removeChild(words_row)}
+            if(column_row){
+                column_row.parentNode.removeChild(column_row)}
+            if(add_input){
+                add_input.parentNode.removeChild(add_input)}
+            if(created_columns){
+                created_columns.parentNode.removeChild(created_columns)}
+             
+            text.className="form-control"
+            text.placeholder="Например: I like [walking] in the park in the morning while i'm [listen]ing to music"
+        }
+        else if (selectedValue == "Расставить слова в правильном порядке")
+        {
+            if(add_words){
+                add_words.parentNode.removeChild(add_words)}
+            if(words_row){
+                words_row.parentNode.removeChild(words_row)}
+            if(column_row){
+                column_row.parentNode.removeChild(column_row)}
+            if(add_input){
+                add_input.parentNode.removeChild(add_input)}
+            if(created_columns){
+                created_columns.parentNode.removeChild(created_columns)}
+            
+            text.className="form-control"
+            text.placeholder="Например: We/moved/to/California/last/summer"
+        }
+        else if (selectedValue == "Вычеркнуть лишнее слово")
+        {
+            if(add_words){
+                add_words.parentNode.removeChild(add_words)}
+            if(words_row){
+                words_row.parentNode.removeChild(words_row)}
+            if(column_row){
+                column_row.parentNode.removeChild(column_row)}
+            if(add_input){
+                add_input.parentNode.removeChild(add_input)}
+            if(created_columns){
+                created_columns.parentNode.removeChild(created_columns)}
+            
+            text.className="form-control"
+            text.placeholder="Например: \nsilver   bracelet/earrings/<gloves>/ring. \ndenim   jacket/<jeans>/jumper/skirt."
+        }
+        else if (selectedValue == "Matching – соединить значения / 2 части предложения")
+        {
+            if(add_words){
+                add_words.parentNode.removeChild(add_words)}
+            if(words_row){
+                words_row.parentNode.removeChild(words_row)}
+            if(column_row){
+                column_row.parentNode.removeChild(column_row)}
+            if(add_input){
+                add_input.parentNode.removeChild(add_input)}
+            if(created_columns){
+                created_columns.parentNode.removeChild(created_columns)}
+            
+            var dd = document.querySelector("#content > div > form > div > div:nth-child(3)")
+            var dd3 = document.createElement('div')
+            dd3.className="row"
+            dd3.id="all_rows"
+            var div = document.createElement('div')
+            div.className="row ml-2"
+            div.id="words_row"
+            var input = document.createElement('input')
+            input.className="form-control col-3 mx-3"
+            input.name="first"
+            input.placeholder="Слово 1"
+            var input2 = document.createElement('input')
+            input2.className="form-control col-3 mx-3"
+            input2.name="second"
+            input2.placeholder="Слово 2"
+            text.className="d-none"
+            var i = document.createElement('i')
+            i.className="fa fa-times"
+            i.aria_hidden="true"
+            var button = document.createElement('button')
+            button.type="button"
+            button.id="button"
+            button.append(i)
+            button.addEventListener('click',function(e){
+                if(e.target && e.target.id=="button"){
+                    e.target.parentElement.remove()
+                }
+                else if(e.target.tagName=="svg"){
+                    e.target.parentElement.parentElement.remove()
+                }
+                else if(e.target.tagName=="path"){
+                    e.target.parentElement.parentElement.parentElement.remove()
+                }
+            })
+            div.append(input)
+            div.append(input2)
+            div.append(button)
+            dd3.append(div)
+            dd.append(dd3)
+            var button2 = document.createElement('button')
+            button2.type="button"
+            button2.innerHTML = "Добавить пару"
+            button2.id = "add_words"
+            dd.append(button2)
+            //window.onload = function() {$("#add_words").click(add_words);}
+            document.addEventListener('click', function(e){
+                if(e.target && e.target.id== 'add_words'){
+                    f_add_words()
+                }
+            });
+            input.addEventListener('change',asd)
+            input2.addEventListener('change',asd)
+            //text.placeholder="We/moved/to/California/last/summer"
+        }
+        else if (selectedValue == "Подписать картинку и расставить слова в правильном")
+        {
+            if(column_row){
+                column_row.parentNode.removeChild(column_row)}
+            if(add_input){
+                add_input.parentNode.removeChild(add_input)}
+            if(created_columns){
+                created_columns.parentNode.removeChild(created_columns)}
+            
+            alert("Подписать картинку и расставить слова в правильном");
+        }
+        else if (selectedValue == "Вписать ответ в таблицу")
+        {
+            if(column_row){
+                column_row.parentNode.removeChild(column_row)}
+            if(add_input){
+                add_input.parentNode.removeChild(add_input)}
+            if(add_words){
+                add_words.parentNode.removeChild(add_words)}
+            if(words_row){
+                words_row.parentNode.removeChild(words_row)}
+            var dd = document.querySelector("#content > div > form > div > div:nth-child(3)")
+            var dd3 = document.createElement('div')
+            dd3.className="col-12"
+            dd3.id="all_rows"
+            var div = document.createElement('div')
+            div.className="col-12 ml-2"
+            div.id="words_row"
+            var input = document.createElement('input')
+            input.className="col-3 "
+            input.name="first"
+            input.type="number"
+            input.id="c_count"
+            input.value=0
+            text.className="d-none"
+            var button = document.createElement('button')
+            button.type="button"
+            button.className = "col-6"
+            button.innerHTML = "Добавить колонки"
+            button.id = "add_columns"
+            div.append(input)
+            div.append(button)
+            dd3.append(div)
+            dd.append(dd3)
+            var div = document.createElement('div')
+            div.className="col-12 ml-2"
+            div.id="created_columns"
+            dd.append(div)
+
+            document.addEventListener('click', function(e){
+                if(e.target && e.target.id== 'add_columns'){
+                    var input = document.getElementById("c_count");
+                    var button = document.getElementById("add_columns");
+                    var div = document.getElementById("created_columns");
+                    
+                    console.log(input.value)
+                    var i;
+                    for (i = 0; i < input.value; i++) {
+                        column_add()
+                    }
+                    if(input.value>0){
+                        button.className="d-none"
+                        input.className="d-none"
+                    }
+            }})
+        }
+        else if (selectedValue == "Отметить правильные ответы и исправить не верные")
+        {
+            
+            if(add_words){
+                add_words.parentNode.removeChild(add_words)}
+            if(words_row){
+                words_row.parentNode.removeChild(words_row)}
+            if(created_columns){
+                created_columns.parentNode.removeChild(created_columns)}
+            
+            var dd = document.querySelector("#content > div > form > div > div:nth-child(3)")
+            var dd3 = document.createElement('div')
+            dd3.className="col-12"
+            dd3.id="all_rows"
+            var div = document.createElement('div')
+            div.className="col-12"
+            div.id="column_row"
+            var input = document.createElement('input')
+            input.className="col-11"
+            input.name="sentense"
+            input.id="sentense"
+            input.placeholder="Предложение: Неправильное/Правильное"
+            text.className="d-none"
+            var button2 = document.createElement('button')
+            button2.type="button"
+            button2.innerHTML = "Добавить поле"
+            button2.id = "add_input"
+            button2.class = "ml-3"
+            div.append(input)
+            dd3.append(div)
+            dd.append(dd3)
+            dd.append(button2)
+            document.addEventListener('click', function(e){
+                if(e.target && e.target.id== 'add_input'){
+                    f_add_input()
+                }
+            });
+            input.addEventListener('change',zxc)
+        }
+        
+    }
+    function asd(){
+        var text = document.getElementById("id_text");
+        
+        var count = document.getElementsByName('second')[0].parentElement.parentElement.childElementCount
+        text.value=""
+        var i;
+        for (i = 0; i < count; i++) {
+            text.value+="[ " + document.getElementsByName('second')[0].parentElement.parentElement.children[i].children[0].value + " - " + document.getElementsByName('second')[0].parentElement.parentElement.children[i].children[1].value + " ],";
+        }
+    }
+    function qwe(){
+        var text = document.getElementById("id_text");
+        
+        var count = document.querySelector("#column_name").parentElement.parentElement.childElementCount
+        text.value=""
+        var i;
+        for (i = 0; i < count; i++) {
+            text.value+=document.querySelector("#column_name").parentElement.parentElement.children[i].children[1].value + " : " + document.querySelector("#column_name").parentElement.parentElement.children[i].children[3].value + " , ";
+        }
+        console.log(text.value)
+    }
+    function zxc(){
+        var text = document.getElementById("id_text");
+        
+        var count = document.querySelector("#sentense").parentElement.parentElement.childElementCount
+        text.value=""
+        var i;
+        for (i = 0; i < count; i++) {
+            text.value+=document.querySelector("#sentense").parentElement.parentElement.children[i].children[0].value;
+            if(i!=count-1){
+                text.value+=",";
+            }
+        }
+        console.log(text.value)
+    }
+
+    function column_add(){
+        var div = document.getElementById("created_columns");
+        var column = document.createElement('div')
+        column.className="col-12 my-3"
+        column.id="column"
+        var label = document.createElement('label')
+        label.className="col-3 ml-1 "
+        label.id="label"
+        label.innerHTML="Колонка:"
+        var input = document.createElement('input')
+        input.className="col-8 "
+        input.name="column_name"
+        input.id="column_name"
+        input.placeholder="Название колонны"
+
+        column.append(label)
+        column.append(input)
+        
+        var label2 = document.createElement('label')
+        label2.className="col-3 ml-1 "
+        label2.id="label"
+        label2.innerHTML="Слова для этой колонны:"
+        var input2 = document.createElement('input')
+        input2.className="col-8 "
+        input2.name="column_text"
+        input2.id="column_text"
+        input2.placeholder="be/bring/buy/drink/fly/..."
+
+        column.append(label2)
+        column.append(input2)
+
+        div.append(column)
+        input.addEventListener("change", qwe);
+        input2.addEventListener("change", qwe);
+    }
+    function f_add_input(){
+        var text = document.getElementById("id_text")
+        var dd = document.querySelector("#content > div > form > div > div:nth-child(3)")
+        var dd3 = document.getElementById("all_rows")
+        var div = document.createElement('div')
+        div.className="col-12"
+        div.id="words_row"
+        var input = document.createElement('input')
+        input.className="col-11"
+        input.id="sentense"
+        input.name="sentense"
+        input.placeholder="Предложение: Неправильное/Правильное"
+        text.className="d-none"
+        
+        div.append(input)
+        dd3.append(div)
+        input.addEventListener('change',zxc)
+    }
+    ddl.addEventListener("change", validate);
+    </script>
+</div>
+
+{% endblock %}

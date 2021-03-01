@@ -2,18 +2,21 @@
 
 {% block content %}
 
-{{vector.title}}
+<h2>{{ title }}</h2>
+Название: {{vector.title}}
 <br >
-{{vector.short_desc}}
+Описание: {{vector.short_desc}}
 <br >
-{{vector.pub_date}}
+Дата публикации: {{vector.pub_date}}
 <br >
-{{vector.creator_id}}
+Создатель: {{vector.creator_id}}
 <br >
-{{vector.duration}}
+Длительность(курсы под этим направлением):{{vector.duration}} мин.
 <br >
-{{vector.course_count}}
+Количество курсов:{{vector.course_count}}
 <br >
 <a name="" id="" class="btn btn-primary" href="{% url 'editvector' vector.id %}" role="button">Изменить</a>
+
+
 
 {% endblock %}

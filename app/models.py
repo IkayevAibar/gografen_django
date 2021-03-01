@@ -12,12 +12,23 @@ from django.contrib.contenttypes.fields import GenericRelation
 # from comment.models import Comment
 
 Group.add_to_class('description', models.CharField(max_length=180,null=True, blank=True))
+Group.add_to_class('school_id', models.ForeignKey('app.School',on_delete=models.SET_NULL,blank=True,null=True,help_text='Школа'))
+# Group.add_to_class('creator_id', models.ForeignKey('app.appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='zxc'))
 
 def content_file_name_logo(instance, filename):
     return os.path.join(str(instance.id),'logo',filename)
 
 def content_file_name_courses(instance, filename):
     return os.path.join(str(instance.creator_id.school_id.id),'courses',str(instance.title)+"_"+str(instance.creator_id.school_id.id) ,filename)
+
+def content_file_name_hw(instance, filename):
+    return os.path.join(str(instance.student_id.school_id.id),'hw',str(instance.course_id.title),str(instance.lesson_id.id) ,filename)
+
+def content_file_name_ex(instance, filename):
+    return os.path.join(str(instance.creator_id.school_id.id),'exercise',str(instance.lesson_id.id),str(instance.id),filename)
+
+def content_file_name_ex_list(instance, filename):
+    return os.path.join(str(instance.creator_id.school_id.id),'exercise',str(instance.lesson_id.id) ,filename)
 
 def content_file_name_knowledge(instance, filename):
     if(instance.lesson_id):
@@ -64,6 +75,8 @@ class School(models.Model):
     school_logo_1 = models.FileField('Лого 250x64',upload_to=content_file_name_logo,blank=True, null=True)
     school_logo_2 = models.FileField('Лого 16x16',upload_to=content_file_name_logo,blank=True, null=True)
     creator_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True,help_text='Создатель школы')
+    class Meta:
+      verbose_name_plural = "Школы"
     def __str__(self):
         return "%s" % (self.school_name)
 
@@ -121,7 +134,7 @@ class Lesson(models.Model):
 class HomeWork(models.Model):
     title = models.CharField('Название',max_length=20,default="",blank=True, null=True)
     desc = models.TextField('Короткое описание',max_length=200,blank=True, null=True)
-    files = models.FileField('Содержание ДЗ',storage=FileSystemStorage(location='hw'),blank=True, null=True)
+    files = models.FileField('Содержание ДЗ',upload_to=content_file_name_hw,blank=True, null=True)
     pub_date = models.DateField('Дата публикации',default= datetime.date.today,blank=True)
     lesson_id = models.ForeignKey('Lesson',on_delete=models.SET_NULL,blank=True,null=True,help_text='урок')
     course_id = models.ForeignKey('Course',on_delete=models.SET_NULL,blank=True,null=True,help_text='курс')
@@ -132,6 +145,24 @@ class HomeWork(models.Model):
         return "%s" % (self.title)
     def __unicode__(self):
        return self.title
+
+class Exercise(models.Model):
+    title = models.CharField('Название шаблона',max_length=150,default="",blank=True, null=True)
+    desc = models.TextField('Условие упражнение',max_length=200,blank=True, null=True)
+    text = models.TextField('Текст для упражнения',blank=True,null=True)
+    files = models.FileField('Содержание ДЗ',upload_to=content_file_name_ex,blank=True, null=True)
+    creator_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True)
+    ex_id = models.ForeignKey('Exercise_list',on_delete=models.SET_NULL,blank=True,null=True)
+
+
+class Exercise_list(models.Model):
+    title = models.CharField('Название задании',max_length=150,default="",blank=True, null=True)
+    creator_id = models.ForeignKey('appUser',on_delete=models.SET_NULL,blank=True,null=True)
+    pub_date = models.DateField('Дата публикации',default=datetime.date.today,blank=True)
+    files = models.FileField('Файлы',upload_to=content_file_name_ex_list,blank=True, null=True)
+    lesson_id = models.ForeignKey('Lesson',on_delete=models.SET_NULL,blank=True,null=True,help_text='урок')
+
+
 
 class KnowledgeBase(models.Model):
     files = models.FileField('Файлы',upload_to=content_file_name_knowledge,blank=True, null=True)

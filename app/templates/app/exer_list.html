@@ -1,0 +1,208 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ex_list.title}}</h2>
+    
+    {% if exercises %}
+            {% for e in exercises %}
+            <div class="row ">
+                <div class="col-10">
+                    <div class="card ">
+                        <div class="card-body ">
+                            <h3 class="card-title">{{e.title}}</h3>
+                            <h5 class="card-title">{{e.desc}}</h4>
+                            <hr >
+                            <p class="card-text d-none">{{e.text}}</p>
+                            <div class="" id="answer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        
+    {% else %}
+    Нет добавленных задании
+    {% endif %}
+    <hr >
+    <a name="" id="" class="btn btn-primary" href="{% url 'exercise' id l_id ex_list.id %}" role="button">Добавить задание по шаблону</a>
+</div>
+<script>
+Object.defineProperty(Array.prototype, 'shuffle', {
+    value: function() {
+        for (let i = this.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this[i], this[j]] = [this[j], this[i]];
+        }
+        return this;
+    }
+});
+
+var count = {{exercises.count}}
+var rows = document.querySelectorAll("#content > div > .row")
+var i;
+
+for (i = 0; i < count; i++) {    
+    var text = rows[i].children[0].children[0].children[0].children[3].textContent
+    var type = rows[i].children[0].children[0].children[0].children[0].textContent
+    var answer = rows[i].children[0].children[0].children[0].children[4]
+
+    var div2 = document.createElement('div')
+    
+    if(type === "Вставить слова в текст"){
+        var textarea = document.createElement('textarea');
+        textarea.className="form-control";
+        textarea.name="text"
+        textarea.cols="60"
+        textarea.rows="3"
+        textarea.id="id_text"
+        arr = text.split(' ')
+        arr2 = []
+        arr3 = []
+        var j;
+        for (j = 0; j < arr.length; j++) {
+            var input = document.createElement('input')
+            input.name="word"
+            input.className = "col-2 border border-dark rounded"
+            if(arr[j][0]=="["){
+                if(arr[j][arr[j].length - 1]=="]"){
+                    arr2.push(arr[j])
+                    div2.append(input)
+                    div2.append(" ")
+                }
+                else{
+                    var k;
+                    var wd="";
+                    var sd="";
+                    for (k=0; k < arr[j].length; k++){
+                        sd+=arr[j][k]
+                        if(arr[j][k]=="]"){
+                            arr2.push(sd)
+                            div2.append(input)
+                            if(k<arr[j].length){
+                                var l;
+                                for (l=k+1; l < arr[j].length; l++){
+                                    wd += arr[j][l]
+                                }
+                                div2.append(wd)
+                                if(j<arr.length){
+                                    div2.append(" ")
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
+            else{
+                if(arr[j][arr[j].length - 1]=="]"){
+                    if(j-1>0){
+                        arr2.push(arr[j-1] + " " + arr[j])
+                    }
+                    div2.append(input)
+                    div2.append(" ")
+                }
+                else{
+                    div2.append(arr[j])
+                    if(j<arr.length){
+                        div2.append(" ")
+                    }
+                }
+            }
+        }
+        var div = document.createElement('div')
+        var o;
+
+        for (o = 0; o < arr2.length; o++) {
+            arr2[o]=arr2[o].replace('[','')
+            arr2[o]=arr2[o].replace(']','')
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded-circle"
+            span.textContent = arr2[o]
+            div.append(span)
+        }
+        answer.append(div)
+        answer.append(div2)
+    }
+    if(type == "Вычеркнуть лишнее слово"){
+        arr11 = text.split('.')
+        arr11 = arr11.filter(Boolean)
+        var gdiv = document.createElement('div')
+        var w;
+        for (w = 0; w < arr11.length; w++) {
+            var row = document.createElement('div')
+            row.className = "row"
+            var asd = arr11[w].split(' ').filter(Boolean)
+            var col = document.createElement('div')
+            col.className="col-3 ml-5"
+            col.append(asd[0])
+            row.append(col)
+            var ans = asd[1].split('/')
+            var col2 = document.createElement('div')
+            col2.className="col-5"
+            var f;
+            for (f = 0; f < ans.length; f++) {
+                var span = document.createElement('span')
+                span.id="ansr"
+                span.addEventListener('click',function(e){
+                    if(e.target && e.target.id=="ansr"){
+                        var others = e.target.parentElement.children
+                        var q;
+                        for (q = 0; q < others.length; q++) { 
+                            others[q].style=""
+                        }
+                        e.target.style="text-decoration: line-through;"
+
+                    }
+                })
+                if(ans[f][0]=='<' && ans[f][ans[f].length-1]=='>'){
+                    var v;
+                    var wd="";
+                    for (v = 1; v < ans[f].length-1; v++) {
+                        wd+=ans[f][v]
+                    }
+                    span.append(wd)
+                    col2.append(span)
+                    if(f<ans.length-1){
+                        col2.append(" / ")
+                    }
+                    wd=""
+                }
+                else{
+                    span.append(ans[f])
+                    
+                    col2.append(span)
+                    if(f<ans.length-1){
+                        col2.append(" / ")
+                    }
+                }
+            }
+            row.append(col2)
+            answer.append(row)
+        }
+    }
+    if(type === "Расставить слова в правильном порядке"){
+        arr22 = text.split('/')
+        arr22=arr22.shuffle()
+        console.log(arr22)
+        var gdiv = document.createElement('div')
+        var div = document.createElement('div')
+        var o;
+        
+        for (o = 0; o < arr22.length; o++) {
+            var input = document.createElement('input')
+            input.name="word3"
+            input.className = "col-2 border border-dark rounded m-2"
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded"
+            span.textContent = arr22[o]
+            gdiv.append(span)
+            div.append(input)
+        }
+        answer.append(gdiv)
+        answer.append(div)
+    }
+}
+
+</script>
+{% endblock %}

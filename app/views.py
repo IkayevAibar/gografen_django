@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime 
 from django.shortcuts import render,redirect
 from django.http import HttpRequest,HttpResponse, HttpResponseNotFound,HttpResponseRedirect
 from django.utils import timezone
@@ -38,6 +38,8 @@ from gografen.settings import MEDIA_ROOT
 from rest_framework.authtoken.models import Token
 import vimeo
 
+
+datetime=datetime.datetime 
 # from django.contrib.auth.mixins import UserPassesTestMixin
 # from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -271,8 +273,28 @@ def users(request):
     sub_domain = request.get_host().split('.')[0]
     if(sub_domain != "localhost:8000"):
         """Renders the users page."""
+        search_ = None
+        search_results_by_email=None
+        if(request.GET.get('search')):
+            search_=request.GET['search']
         school_ = School.objects.filter(sub_domen=(sub_domain+".gografen.com"))
         users = appUser.objects.filter(school_id=school_[0])
+        if(search_):
+            if(len(search_)>0):
+                search_results_by_email = users.filter(email__icontains=search_)
+                search_results_by_name = users.filter(first_name__icontains=search_)
+                search_results_by_surname = users.filter(last_name__icontains=search_)
+                search_results_by_fathername = users.filter(last_name__icontains=search_)
+                search_results_by_email|=search_results_by_name
+                search_results_by_email|=search_results_by_surname
+                search_results_by_email|=search_results_by_fathername
+                search_results_by_email.distinct('id')
+        
+        if(search_results_by_email!=None):
+            if(len(search_results_by_email)>0):
+                users = search_results_by_email
+            else:
+                users = None
         assert isinstance(request, HttpRequest)
         return render(
             request,
@@ -538,7 +560,8 @@ def roles(request):
         """Renders the roles page."""
         school_ = School.objects.filter(sub_domen=(sub_domain+".gografen.com"))
         users = appUser.objects.filter(school_id=school_[0])
-        g = Group.objects.all()
+        g = Group.objects.filter(school_id=None)
+        g |= Group.objects.filter(school_id=school_[0])
         g_c = {}
         for gr in g:
             count = 0
@@ -575,8 +598,23 @@ def settings(request):
         if request.method == 'POST':
             f = SchoolSettingsChangeForm(request.POST,request.FILES or None, instance=request.user)
             if f.is_valid():
+                name_check = School.objects.filter(school_name=f.data['school_name']).exclude(id=school.id)
+                domen_check= School.objects.filter(sub_domen=f.data['sub_domen']).exclude(id=school.id)
+                if(len(name_check)>0 or len(domen_check)>0):
+                    return render(
+                        request,
+                        'app/settings.html',
+                        {
+                            'title':'settings',
+                            'message':'Your settings page.',
+                            'year':datetime.now().year,
+                            'school': school,
+                            'f':f,
+                            'error':"Название школы или домен уже существует"
+                        }
+                    )
                 school.school_name = f.data['school_name']
-                school.sub_domen = f.data['sub_domen']
+                school.sub_domen = f.data['sub_domen'].lower()
                 school.school_logo_1 = request.FILES.get('school_logo_1', None)
                 school.school_logo_2 = request.FILES.get('school_logo_2', None)
                 school.save(update_fields=["school_name","sub_domen","school_logo_1","school_logo_2"])
@@ -1175,9 +1213,16 @@ def addcourse(request):
                 course.mini_poster = request.FILES.get('mini_poster', None)
                 course.short_desc = form.data['short_desc']
                 course.full_desc = form.data['full_desc']
-                course.end_date = form.data['end_date']
-                course.creator_id = school_teachers.filter(id=form.data['creator_id']).first()
-                course.vector_id = vectors.filter(id=form.data['vector_id']).first()
+                if(form.data['end_date']!=''):
+                    course.end_date = form.data['end_date']
+                if(form.data['creator_id']!='0'):
+                    course.creator_id = school_teachers.filter(id=form.data['creator_id']).first()
+                else:
+                    course.creator_id = request.user
+                if(form.data['vector_id']!='0'):
+                    course.vector_id = vectors.filter(id=form.data['vector_id']).first()
+                else:
+                    course.vector_id = None
                 course.save()
                 
                 # kb = KnowledgeBase.objects.create(
@@ -1323,7 +1368,7 @@ def lesson(request,id,l_id):
         lesson = Lesson.objects.filter(id=l_id)
         lessons = Lesson.objects.filter(course_id=lesson[0].course_id)
         is_sent = HomeWork.objects.filter(student_id=request.user,course_id=Course.objects.filter(id=id).first(),lesson_id=Lesson.objects.filter(id=l_id).first())
-        
+        ex_list = Exercise_list.objects.filter(lesson_id=l_id).first()
         if(request.user.school_id != lesson[0].course_id.creator_id.school_id):
             return redirect('courses')
         
@@ -1332,6 +1377,37 @@ def lesson(request,id,l_id):
         if(access.count()<1 and l!='MainTeacher' and l!='Teacher'):
             return redirect('course',id)
         
+        if(request.method=="POST"):
+            form = Exercise_listAddForm(request.POST,request.FILES or None)
+            print(form.data)
+            if form.is_valid():
+                # print(request.FILES['files'])
+                form.save()
+                
+                return redirect('lesson',id,l_id)
+            else:
+                assert isinstance(request, HttpRequest)
+                return render(
+                    request,
+                    'app/lesson.html',
+                    {
+                        'title':'exer',
+                        'message':'Your application description page.',
+                        'year':datetime.now().year,
+                        'form':form,
+                        'school': school,
+                        'c_id':lesson[0].course_id,
+                        'lesson':lesson[0],
+                        'lessons':lessons,
+                        'access' : access,
+                        'is_sent':is_sent,
+                        'ex_list':ex_list,
+                        'l_id':l_id,
+                        'id':id,
+                    }
+                )
+        else:
+            form = Exercise_listAddForm()
         assert isinstance(request, HttpRequest)
         return render(
             request,
@@ -1340,12 +1416,16 @@ def lesson(request,id,l_id):
                 'title':'Course ',
                 'message':'Your application description page.',
                 'year':datetime.now().year,
+                'form':form,
                 'school': school,
                 'c_id':lesson[0].course_id,
                 'lesson':lesson[0],
                 'lessons':lessons,
                 'access' : access,
-                'is_sent':is_sent
+                'is_sent':is_sent,
+                'ex_list':ex_list,
+                'l_id':l_id,
+                'id':id,
             }
         )
     else:
@@ -1448,10 +1528,10 @@ def addlesson(request,id):
     school = School.objects.filter(id=request.user.school_id.id)[0]
     sub_domain = request.get_host().split('.')[0]
     school_teachers = appUser.objects.filter(groups=(Group.objects.filter(name="Teacher")[0]),school_id=school.id)
-    v = vimeo.VimeoClient(token='35420b200bb4b36c2323ba71f3b95352',
-                            key='b3fd03bb2e3ec1a808cbbf0a2eba71179e6309a2',
-                            secret='VBdIoArUuMZlte7jj0OvznNqVQuHFoBFJJ1NvbDwnWc44Fjls2xOBRCa4rY0PcCS+9Qa3VXA+jdXJ+MRPQKsW1JHZLV+9jlk0sb51qUvpjvxz5vp2eIZrtFIymDPUWwe'
-                            )
+    # v = vimeo.VimeoClient(token='35420b200bb4b36c2323ba71f3b95352',
+    #                         key='b3fd03bb2e3ec1a808cbbf0a2eba71179e6309a2',
+    #                         secret='VBdIoArUuMZlte7jj0OvznNqVQuHFoBFJJ1NvbDwnWc44Fjls2xOBRCa4rY0PcCS+9Qa3VXA+jdXJ+MRPQKsW1JHZLV+9jlk0sb51qUvpjvxz5vp2eIZrtFIymDPUWwe'
+    #                         )
     
     if(sub_domain != "localhost:8000"):
         print(request.method)
@@ -1814,7 +1894,7 @@ def addhw(request):
         # if(request.user.school_id != course.creator_id.school_id):
         #     return HttpResponseNotFound('<h1>Page not found</h1>')
         if(request.method=="POST"):
-            form = HomeworkAddForm(request.POST)
+            form = HomeworkAddForm(request.POST,request.FILES or None)
             if form.is_valid():
                 # print(request.FILES['files'])
                 form.save()
@@ -1854,3 +1934,56 @@ def addhw(request):
     else:
         return redirect('main')
 
+
+def exersise(request,id,l_id,e_id):
+    if(request.method=="POST"):
+        form = ExerciseAddForm(request.POST,request.FILES or None)
+        print(form.data)
+        if form.is_valid():
+            form.save()
+            return redirect('exer_list',id,l_id)
+        else:
+            assert isinstance(request, HttpRequest)
+            return render(
+                request,
+                'app/exer.html',
+                {
+                    'title':'exer',
+                    'message':'Your application description page.',
+                    'year':datetime.now().year,
+                    'form':form,
+                    'e_id':e_id,
+                }
+            )
+    else:
+        form = ExerciseAddForm()
+    return render(
+            request,
+            'app/exer.html',
+            {
+                'title':'exer ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'form':form,
+                'e_id':e_id,
+            }
+        )
+
+def exersise_list(request,id,l_id):
+    ex_list = Exercise_list.objects.filter(lesson_id=l_id).first()
+    exercises = Exercise.objects.filter(ex_id=ex_list.id)
+       
+    return render(
+            request,
+            'app/exer_list.html',
+            {
+                'title':'exer ',
+                'message':'Your application description page.',
+                'year':datetime.now().year,
+                'l_id':l_id,
+                'id':id,
+                'exercises':exercises,
+                'ex_list':ex_list,
+
+            }
+        )

@@ -13,14 +13,14 @@
                     value="{{hw.title}}"
                 {% endif %}
                 >
-                <label for="id_desc">Короткое описание:</label>
+                <label for="id_desc">Описание:</label>
                 <textarea name="desc" cols="40" rows="10" maxlength="200" id="id_desc">{{hw.desc}}</textarea>
-                <label for="id_files">Содержание ДЗ:</label>
+                <label for="id_files">Прикрепить файл:</label>
                 <input type="file" name="files" id="id_files">
                 {% comment %} <input type="text" class="form-control " name="lesson_id" id="inputName" placeholder="" value="{{l_id.id}}"> {% endcomment %}
                     {{date}}
                 <div class="form-group">
-                    <label for="">Курс</label>
+                    <label for="">Прикрепить к курсу</label>
                     <select class="custom-select" name="course_id" id="course_id">
                         <option selected>Выберете курс из списка</option>
                         {% for key,value in dict.items %}
@@ -46,7 +46,7 @@
                 
                 <input type="text" class="form-control d-none" name="student_id" id="inputName" placeholder="" value="{{user.id}}">
                 <hr>
-                <button type="submit" class="btn btn-primary">Отправить</button>
+                <button type="submit" class="btn btn-primary">Создать</button>
             </form>
         </div>
     </div>

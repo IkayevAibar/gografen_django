@@ -75,10 +75,10 @@
                             <div class="input-group-prepend">
                                 <label class="input-group-text" for="id_end_date" id="basic-addon31">Дата оконачание:</label>
                             </div>
-                            <input type="date" class="form-control  " name="end_date" maxlength="30"  required="" id="id_end_date"  aria-label="end_date" aria-describedby="basic-addon"> 
+                            <input type="date" class="form-control  " name="end_date" maxlength="30"   id="id_end_date"  aria-label="end_date" aria-describedby="basic-addon"> 
                         </div>
                         <select class="custom-select" id="id_vector_id" name="vector_id" required>
-                            <option selected>Выбрать...</option>
+                            <option value="0" selected>Выбрать...</option>
                             {% for vector in vectors %}
                                 <option value = {{vector.id}}>{{vector.title}}</option>
                             {% endfor %}
@@ -86,7 +86,7 @@
                         <div class="form-group">
                             <label for="">Выбрать учителя</label>
                             <select name="creator_id" id="id_creator_id" class="custom-select">
-                                    <option value="" selected="">---------</option>
+                                    <option value="0" selected="">---------</option>
                                     {% comment %} <option value="{{user.id}}" >{{user}}</option> {% endcomment %}
                                     {% for teacher in teachers %}
                                         <option value="{{teacher.id}}">{{teacher}}</option>

@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'landing',
     # 'comment',
 ]
-
+# DEFAULT_FILE_STORAGE = 'utils.storage.ASCIIFileSystemStorage'
 AUTH_USER_MODEL = 'app.appUser'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

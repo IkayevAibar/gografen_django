@@ -23,6 +23,47 @@
                     {% endif %}
                     
                 </div>
+                {% if ex_list %}
+                    <a name="" id="" class="btn btn-primary" href="{% url 'exer_list' id l_id  %}" role="button">Зайти в секцию Задании</a>
+                {% else %}
+                    <a href="" type="button" class="btn btn-primary" data-href="delete.php?id=23" data-toggle="modal" data-target="#confirm-delete-1">Добавить задании</a>
+                {% endif %}
+                <div class="modal fade" id="confirm-delete-1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <form class="modal-content" action="" method="POST" enctype="multipart/form-data">
+                            <div class="modal-header">
+                                Добавление задании для урока
+                            </div>
+                            <div class="modal-body">
+                                {% csrf_token %}
+                                <div class="col-sm-7">
+                                    <div class="form-group row">
+                                        <label for="">Название задании:</label>
+                                        <input type="text" class="form-control ml-3" name="title" id="id_title" placeholder="" value="">
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="custom-file">
+                                            <input type="file" name="files" id="id_files" placeholder="" class="custom-file-input" aria-describedby="fileHelpId">
+                                            <span class="custom-file-control">Нажмите сюда чтобы загрузить файл</span>
+                                            <small id="fileHelpId" class="form-text text-muted">до 100 МБ</small>
+                                        </label>
+                                    </div>
+                                    <input type="text" class="form-control d-none" name="creator_id" id="id_creator_id" placeholder="" value="{{user.id}}">
+                                    <input type="text" class="form-control d-none" name="lesson_id" id="id_lesson_id" placeholder="" value="{{l_id}}">
+                                    
+                                    {% comment %} <a name="" id="" class="btn btn-primary" href="{% url 'exercise'  %}" role="button">+</a> {% endcomment %}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                                <button type="submit" class="btn btn-primary">Добавить</button>
+
+                                
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
                 {% for perm in user.get_group_permissions  %}
                     {% if perm == 'app.change_lesson' %}
                         <a name="" id="" class="btn btn-info" href=" {% url 'editlesson' c_id.id lesson.id %}" role="button">edit</a>

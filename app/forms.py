@@ -1,5 +1,5 @@
 from django import forms
-from .models import Comment, HomeWork, Vector, appUser,Course,Lesson,School
+from .models import *
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm
 from django.contrib.auth.models import Group,Permission
 from django.core.exceptions import ValidationError
@@ -23,7 +23,7 @@ class SchoolSettingsChangeForm(forms.ModelForm):
 class CourseAddForm(forms.ModelForm):
     class Meta:
         model=Course 
-        fields = ('title', 'cost', 'poster','mini_poster','short_desc', 'full_desc','end_date','vector_id')
+        fields = ('title', 'cost', 'poster','mini_poster','short_desc', 'full_desc','end_date')
 
 class VectorAddForm(forms.ModelForm):
     class Meta:
@@ -35,12 +35,20 @@ class HomeworkAddForm(forms.ModelForm):
         model=HomeWork 
         fields = ('title','desc', 'files','student_id','course_id','lesson_id')
 
+class ExerciseAddForm(forms.ModelForm):
+    class Meta:
+        model = Exercise
+        fields =('title','desc','text','creator_id','ex_id')
 
+class Exercise_listAddForm(forms.ModelForm):
+    class Meta:
+        model = Exercise_list
+        fields =('title','files','creator_id','lesson_id')
 
 class LessonAddForm(forms.ModelForm):
     class Meta:
         model=Lesson 
-        fields = ('title', 'files','video','short_desc', 'full_desc','duration','teacher_id','course_id')
+        fields = ('title', 'files','video','short_desc','full_desc','duration','teacher_id','course_id')
 
 class CommentAddForm(forms.ModelForm):
     class Meta:
@@ -64,7 +72,7 @@ class GroupCreationForm(forms.ModelForm):
     
     class Meta:
         model=Group 
-        fields = ('name','description','permissions')
+        fields = ('name','description','permissions','school_id')
 
 class GroupChangeForm(forms.ModelForm):
     permissions = forms.MultipleChoiceField(label = "Права:", choices=Permission.objects.values_list('id', 'name'), widget = forms.CheckboxSelectMultiple)

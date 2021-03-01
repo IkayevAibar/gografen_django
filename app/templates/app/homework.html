@@ -15,9 +15,8 @@
                 <input type="text" class="form-control d-none" name="course_id" id="inputName" placeholder="" value="{{c_id}}">
                 <input type="text" class="form-control d-none" name="student_id" id="inputName" placeholder="" value="{{hw.student_id.id}}">
                 <hr>
-                {{hw.files}}
                 {% if hw.files %}
-                    {{hw.files.path}}
+                    <a name="" id="" class="btn btn-primary" href="{{hw.files.url}}" download="{{hw.files.name}}" role="button">Скачать Работу</a>
                 {% endif %}
                 <button type="submit" class="btn btn-warning">Проверить</button>
                 <a name="" id="" class="btn btn-primary" href="{% url 'edithomework' hw.id %}" role="button">Изменить</a>
