@@ -1369,6 +1369,10 @@ def lesson(request,id,l_id):
         lessons = Lesson.objects.filter(course_id=lesson[0].course_id)
         is_sent = HomeWork.objects.filter(student_id=request.user,course_id=Course.objects.filter(id=id).first(),lesson_id=Lesson.objects.filter(id=l_id).first())
         ex_list = Exercise_list.objects.filter(lesson_id=l_id).first()
+        if(ex_list):
+            exercises = Exercise.objects.filter(ex_id=ex_list.id)
+        else:
+            exercises = None
         if(request.user.school_id != lesson[0].course_id.creator_id.school_id):
             return redirect('courses')
         
@@ -1402,6 +1406,7 @@ def lesson(request,id,l_id):
                         'access' : access,
                         'is_sent':is_sent,
                         'ex_list':ex_list,
+                        'exercises':exercises,
                         'l_id':l_id,
                         'id':id,
                     }
@@ -1424,6 +1429,7 @@ def lesson(request,id,l_id):
                 'access' : access,
                 'is_sent':is_sent,
                 'ex_list':ex_list,
+                'exercises':exercises,
                 'l_id':l_id,
                 'id':id,
             }

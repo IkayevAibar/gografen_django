@@ -2,11 +2,12 @@
 
 {% block content %}
 <div class="container">
-    <h2>{{ex_list.title}}</h2>
+    <a name="" id="" class="btn btn-primary" href=" {% url 'lesson' id l_id %}" role="button">Назад</a>
+    <h2 class="text-center col-10">{{ex_list.title}}</h2>
     
     {% if exercises %}
             {% for e in exercises %}
-            <div class="row ">
+            <div class="row my-2 ">
                 <div class="col-10">
                     <div class="card ">
                         <div class="card-body ">
@@ -184,7 +185,6 @@ for (i = 0; i < count; i++) {
     if(type === "Расставить слова в правильном порядке"){
         arr22 = text.split('/')
         arr22=arr22.shuffle()
-        console.log(arr22)
         var gdiv = document.createElement('div')
         var div = document.createElement('div')
         var o;
@@ -200,6 +200,127 @@ for (i = 0; i < count; i++) {
             div.append(input)
         }
         answer.append(gdiv)
+        answer.append(div)
+    }
+    if(type === "Matching – соединить значения / 2 части предложения"){
+        adw = text.split(',').filter(Boolean)
+        var asd1=[];
+        var asd2=[];
+        var o;
+        for (o = 0; o < adw.length; o++) {
+            var wad = adw[o].replace('[','').replace(']','')
+            wad = wad.split('-').filter(Boolean)
+            var v;
+            for (v = 0; v < wad.length; v++) {
+                if(v%2==0){
+                    asd1.push(wad[v])
+                }
+                else{
+                    asd2.push(wad[v])
+                }
+            }
+
+        }
+        
+        var div = document.createElement('div')
+        div.className="row"
+        var diva = document.createElement('div')
+        diva.id="a"
+        diva.className= "col-6 border-right border-dark d-flex justify-content-center"
+        var divb = document.createElement('div')
+        divb.id="b"
+        divb.className="col-6 border-left border-dark d-flex justify-content-center"
+        var div2 = document.createElement('div')
+        div2.className="row"
+        var diva2 = document.createElement('div')
+        diva2.id="a"
+        diva2.className= "col-12 my-1 d-flex justify-content-around"
+        var divb2 = document.createElement('div')
+        divb2.id="b"
+        divb2.className="col-12 my-1  d-flex justify-content-around"
+        var q;
+        for (q = 0; q < asd1.length; q++) { 
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded"
+            span.textContent = asd1[q]
+            diva.append(span)
+            var input = document.createElement('input')
+            input.name="match-input"
+            input.className = "col-3 "
+            diva2.append(input)
+        }
+        for (q = 0; q < asd2.length; q++) { 
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded"
+            span.textContent = asd2[q]
+            var input = document.createElement('input')
+            input.name="match-input"
+            input.className = "col-3  "
+            divb.append(span)
+            divb2.append(input)
+        }
+        div.append(diva)
+        div.append(divb)
+        answer.append(div)
+        
+        div2.append(diva2)
+        div2.append(divb2)
+        answer.append(div2)
+    }
+    if(type === "Вписать ответ в таблицу"){
+        list = []
+        table_names = []
+        tables = text.split(',').filter(Boolean)
+        var div = document.createElement('div')
+        var div2 = document.createElement('div')
+        div2.className="row"
+        var q;
+        for (q = 0; q < tables.length; q++) { 
+            variants = tables[q].split(':')
+            var div3 = document.createElement('div')
+            div3.className="col-6 "
+            var label = document.createElement('div')
+            label.className = "text-center"
+            label.innerHTML = variants[0]
+            div3.append(label)
+            var vv = variants[1].split('/').filter(Boolean)
+            var v;
+            for (v = 0; v < vv.length; v++) {
+                list.push(vv[v].trim())
+                var input = document.createElement('input')
+                input.className="ml-5 col-8"
+                div3.append(input)
+            }
+            div2.append(div3)
+        }
+        
+        div.append(div2)
+        
+        //var td2 = document.createElement('td')
+        //td2.innerHTML=vv[v].trim()
+        //tr2.append(td2)
+        var diva = document.createElement('div')
+        var o;
+
+        for (o = 0; o < list.length; o++) {
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded"
+            span.textContent = list[o]
+            diva.append(span)
+        }
+        answer.append(diva)
+        answer.append(div)  
+    }
+    if(type === "Отметить правильные ответы и исправить не верные"){
+        var elms = text.split(',').filter(Boolean)
+        var div = document.createElement('div')
+        var o;
+        for (o = 0; o < elms.length; o++) {
+            var input = document.createElement('input')
+            input.className="form-control"
+            input.value=elms[o].split('/').filter(Boolean)[0]
+            div.append(input)
+        }
         answer.append(div)
     }
 }

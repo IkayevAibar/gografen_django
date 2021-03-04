@@ -21,10 +21,60 @@
                         Your browser does not support the video tag.
                     </video>
                     {% endif %}
+                    <hr >
+                    <form action="" method="post" class="card text-center" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <label for="id_title">Название:</label>
+                        <input type="text" name="title" maxlength="20" id="id_title"
+                        {% if hw %}
+                            value="{{hw.title}}"
+                        {% endif %}
+                        >
+                        {% if ex_list %}
+                            <textarea class="d-none" name="desc" cols="40" rows="10" maxlength="200" id="id_desc">{{hw.desc}}</textarea>
+                            <h2 class="text-center col-12">{{ex_list.title}}</h2>
+                            <div id="id="exercises"">
+                                {% if exercises %}
+                                    {% for e in exercises %}
+                                    <div id="exer"  class="row my-2 ">
+                                        <div class="col-12">
+                                            <div class="card ">
+                                                <div class="card-body ">
+                                                    <h3 class="card-title">{{e.title}}</h3>
+                                                    <h5 class="card-title">{{e.desc}}</h4>
+                                                    <hr >
+                                                    <p class="card-text d-none">{{e.text}}</p>
+                                                    <div class="" id="answer"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                Нет добавленных задании
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <label for="id_desc">Короткое описание:</label>
+                            <textarea name="desc" cols="40" rows="10" maxlength="200" id="id_desc">{{hw.desc}}</textarea>
+                        {% endif %}
+                        
+                        <hr >
+
+                        <label for="id_files">Содержание ДЗ:</label>
+                        <input type="file" name="files" id="id_files">
+                        <input type="text" class="form-control d-none" name="lesson_id" id="inputName" placeholder="" value="{{lesson.id}}">
+                        <input type="text" class="form-control d-none" name="course_id" id="inputName" placeholder="" value="{{id}}">
+                        <input type="text" class="form-control d-none" name="student_id" id="inputName" placeholder="" value="{{user.id}}">
+                        <hr>
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                    </form>
                     
                 </div>
                 {% if ex_list %}
-                    <a name="" id="" class="btn btn-primary" href="{% url 'exer_list' id l_id  %}" role="button">Зайти в секцию Задании</a>
+                    {% if user.id == lesson.course_id.course.creator_id.id or user.id == lesson.course_id.creator_id.school_id.creator_id.id  %}
+                        <a name="" id="" class="btn btn-primary" href="{% url 'exer_list' id l_id  %}" role="button">Зайти в секцию Задании</a>
+                    {% endif %}
                 {% else %}
                     <a href="" type="button" class="btn btn-primary" data-href="delete.php?id=23" data-toggle="modal" data-target="#confirm-delete-1">Добавить задании</a>
                 {% endif %}
@@ -118,4 +168,541 @@
         </div>
     </div>
 </div>
+<script>
+Object.defineProperty(Array.prototype, 'shuffle', {
+    value: function() {
+        for (let i = this.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this[i], this[j]] = [this[j], this[i]];
+        }
+        return this;
+    }
+});
+
+var count = {{exercises.count}}
+var rows = document.querySelector("#id\\=").querySelectorAll('.row')
+var i;
+{% comment %} JSON.stringify({});  {% endcomment %}
+var answers=[];
+var asnwer1;
+var answer3;
+var asnwer5;
+var asnwer6;
+var asnwer8;
+var asnwer9;
+
+for (i = 0; i < count; i++) {    
+    var text = rows[i].children[0].children[0].children[0].children[3].textContent
+    var type = rows[i].children[0].children[0].children[0].children[0].textContent
+    var answer = rows[i].children[0].children[0].children[0].children[4]
+
+    var div2 = document.createElement('div')
+    
+    if(type === "Вставить слова в текст"){
+        
+        arr = text.split(' ')
+        arr2 = []
+        arr3 = []
+        var j;
+        for (j = 0; j < arr.length; j++) {
+            var input = document.createElement('input')
+            input.name="word";
+            input.id="answer1";
+            input.className = "col-2 border border-dark rounded"
+            if(arr[j][0]=="["){
+                if(arr[j][arr[j].length - 1]=="]"){
+                    arr2.push(arr[j])
+                    div2.append(input)
+                    div2.append(" ")
+                }
+                else{
+                    var k;
+                    var wd="";
+                    var sd="";
+                    for (k=0; k < arr[j].length; k++){
+                        sd+=arr[j][k]
+                        if(arr[j][k]=="]"){
+                            arr2.push(sd)
+                            div2.append(input)
+                            if(k<arr[j].length){
+                                var l;
+                                for (l=k+1; l < arr[j].length; l++){
+                                    wd += arr[j][l]
+                                }
+                                div2.append(wd)
+                                if(j<arr.length){
+                                    div2.append(" ")
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
+            else{
+                if(arr[j][arr[j].length - 1]=="]"){
+                    if(j-1>0){
+                        arr2.push(arr[j-1] + " " + arr[j])
+                    }
+                    div2.append(input)
+                    div2.append(" ")
+                }
+                else{
+                    div2.append(arr[j])
+                    if(j<arr.length){
+                        div2.append(" ")
+                    }
+                }
+            }
+        }
+        var div = document.createElement('div')
+        var o;
+
+        for (o = 0; o < arr2.length; o++) {
+            arr2[o]=arr2[o].replace('[','')
+            arr2[o]=arr2[o].replace(']','')
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded-circle"
+            span.textContent = arr2[o]
+            div.append(span)
+        }
+        answer.append(div)
+        answer.append(div2)
+        answer1=
+            {
+                "id":1,
+                "text":text
+            }
+        answers.push(answer1)
+    }
+    if(type == "Вычеркнуть лишнее слово"){
+        arr11 = text.split('.').filter(Boolean)
+        var gdiv = document.createElement('div')
+        var w;
+        for (w = 0; w < arr11.length; w++) {
+            var row = document.createElement('div')
+            row.className = "row"
+            var asd = arr11[w].split(' ').filter(Boolean)
+            var col = document.createElement('div')
+            col.className="col-3 ml-5"
+            col.append(asd[0])
+            row.append(col)
+            var ans = asd[1].split('/')
+            var col2 = document.createElement('div')
+            col2.className="col-5"
+            var f;
+            for (f = 0; f < ans.length; f++) {
+                var span = document.createElement('span')
+                span.id="ansr"
+                span.addEventListener('click',function(e){
+                    if(e.target && e.target.id=="ansr"){
+                        var others = e.target.parentElement.children
+                        var q;
+                        for (q = 0; q < others.length; q++) { 
+                            others[q].style=""
+                        }
+                        e.target.style="text-decoration: line-through;"
+
+                    }
+                })
+                if(ans[f][0]=='<' && ans[f][ans[f].length-1]=='>'){
+                    var v;
+                    var wd="";
+                    for (v = 1; v < ans[f].length-1; v++) {
+                        wd+=ans[f][v]
+                    }
+                    span.append(wd)
+                    col2.append(span)
+                    if(f<ans.length-1){
+                        col2.append(" / ")
+                    }
+                    wd=""
+                }
+                else{
+                    span.append(ans[f])
+                    
+                    col2.append(span)
+                    if(f<ans.length-1){
+                        col2.append(" / ")
+                    }
+                }
+            }
+            row.append(col2)
+            answer.append(row)
+        }
+        answer3=
+            {
+                "id":3,
+                "text":text
+            }
+        answers.push(answer3)
+    }
+    if(type === "Расставить слова в правильном порядке"){
+        arr22 = text.split('/')
+        arr22=arr22.shuffle()
+        var gdiv = document.createElement('div')
+        var div = document.createElement('div')
+        var o;
+        
+        for (o = 0; o < arr22.length; o++) {
+            var input = document.createElement('input')
+            input.name="word3"
+            input.id="word3"
+            input.className = "col-2 border border-dark rounded m-2"
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded"
+            span.textContent = arr22[o]
+            gdiv.append(span)
+            div.append(input)
+        }
+        answer.append(gdiv)
+        answer.append(div)
+        answer5=
+                {
+                    "id":5,
+                    "text":text
+                }
+        answers.push(answer5)
+    }
+    if(type === "Matching – соединить значения / 2 части предложения"){
+        adw = text.split(',').filter(Boolean)
+        var asd1=[];
+        var asd2=[];
+        var o;
+        for (o = 0; o < adw.length; o++) {
+            var wad = adw[o].replace('[','').replace(']','')
+            wad = wad.split('-').filter(Boolean)
+            var v;
+            for (v = 0; v < wad.length; v++) {
+                if(v%2==0){
+                    asd1.push(wad[v])
+                }
+                else{
+                    asd2.push(wad[v])
+                }
+            }
+
+        }
+        
+        var div = document.createElement('div')
+        div.className="row"
+        var diva = document.createElement('div')
+        diva.id="a"
+        diva.className= "col-6 border-right border-dark d-flex justify-content-center"
+        var divb = document.createElement('div')
+        divb.id="b"
+        divb.className="col-6 border-left border-dark d-flex justify-content-center"
+        var div2 = document.createElement('div')
+        div2.className="row"
+        var diva2 = document.createElement('div')
+        diva2.id="a"
+        diva2.className= "col-12 my-1 d-flex justify-content-around"
+        var divb2 = document.createElement('div')
+        divb2.id="b"
+        divb2.className="col-12 my-1  d-flex justify-content-around"
+        var q;
+        for (q = 0; q < asd1.length; q++) { 
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded"
+            span.textContent = asd1[q]
+            diva.append(span)
+            var input = document.createElement('input')
+            input.name="match-input"
+            input.className = "col-3 "
+            diva2.append(input)
+        }
+        for (q = 0; q < asd2.length; q++) { 
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded"
+            span.textContent = asd2[q]
+            var input = document.createElement('input')
+            input.name="match-input"
+            input.className = "col-3  "
+            divb.append(span)
+            divb2.append(input)
+        }
+        div.append(diva)
+        div.append(divb)
+        answer.append(div)
+        
+        div2.append(diva2)
+        div2.append(divb2)
+        answer.append(div2)
+        answer6=
+                {
+                    "id":6,
+                    "text":text
+                }
+        answers.push(answer6)
+
+    }
+    if(type === "Вписать ответ в таблицу"){
+        list = []
+        table_names = []
+        tables = text.split(',').filter(Boolean)
+        var div = document.createElement('div')
+        var div2 = document.createElement('div')
+        div2.className="row"
+        var q;
+        for (q = 0; q < tables.length; q++) { 
+            variants = tables[q].split(':')
+            var div3 = document.createElement('div')
+            div3.className="col-6 "
+            var label = document.createElement('div')
+            label.className = "text-center"
+            label.innerHTML = variants[0]
+            div3.append(label)
+            var vv = variants[1].split('/').filter(Boolean)
+            var v;
+            for (v = 0; v < vv.length; v++) {
+                list.push(vv[v].trim())
+                var input = document.createElement('input')
+                input.className="ml-5 col-8"
+                div3.append(input)
+            }
+            div2.append(div3)
+        }
+        
+        div.append(div2)
+        
+        //var td2 = document.createElement('td')
+        //td2.innerHTML=vv[v].trim()
+        //tr2.append(td2)
+        var diva = document.createElement('div')
+        var o;
+
+        for (o = 0; o < list.length; o++) {
+            var span = document.createElement('span')
+            span.className = "m-3 p-2 border border-dark rounded"
+            span.textContent = list[o]
+            diva.append(span)
+        }
+        answer.append(diva)
+        answer.append(div) 
+        answer8=
+                {
+                    "id":8,
+                    "text":text
+                } 
+        answers.push(answer8)
+        
+    }
+    if(type === "Отметить правильные ответы и исправить не верные"){
+        var elms = text.split(',').filter(Boolean)
+        var div = document.createElement('div')
+        var o;
+        for (o = 0; o < elms.length; o++) {
+            var input = document.createElement('input')
+            input.className="form-control"
+            input.value=elms[o].split('/').filter(Boolean)[0]
+            div.append(input)
+        }
+        answer.append(div)
+        answer9=
+                {
+                    "id":9,
+                    "text":text
+                }
+        answers.push(answer9)
+        
+    }
+}
+function zxc(){
+    var text = document.getElementsByName("desc");
+    var count = {{exercises.count}} 
+    
+    var rows = document.querySelectorAll("#exer")
+    var result={};
+    var i;
+    for (i = 0; i < count; i++) {    
+        var text = rows[i].children[0].children[0].children[0].children[3].textContent
+        var type = rows[i].children[0].children[0].children[0].children[0].textContent
+        var answer = rows[i].children[0].children[0].children[0].children[4]
+        var arr1=[]
+        var div2 = document.createElement('div')
+        
+        if(type === "Вставить слова в текст"){
+            var q;
+            var len = answer.querySelectorAll("#answer1").length;
+            for (q = 0; q < len; q++) { 
+                arr1.push(answer.querySelectorAll("#answer1")[q])
+            }
+            arr = text.split(' ')
+            arr2 = []
+            arr3 = []
+            var j;
+            var jj = 0;
+            var txt="";
+            for (j = 0; j < arr.length; j++) {
+                if(arr[j][0]=="["){
+                    var str = ""
+                    arr[j]=arr[j].replace('[',str.concat('[',answer.querySelectorAll("#answer1")[jj].value,"/"));
+                    str="";
+                    jj++;
+                }
+                txt+=arr[j]
+                if(j<arr.length-1){
+                    txt+=" "
+                }
+            }
+            answers[i].text=txt;
+        }
+        if(type == "Вычеркнуть лишнее слово"){
+            arr11 = text.split('.').filter(Boolean)
+
+            var asas= answer.querySelectorAll('.row');
+            var ww="";
+            var w;
+            for (w = 0; w < arr11.length; w++) {
+                var rr = asas[w].querySelectorAll('#ansr')
+                var d;
+                var lined;
+                for (d = 0; d < rr.length; d++) {
+                    if(rr[d].style.cssText=="text-decoration: line-through;"){
+                        lined=rr[d].textContent;
+                    }
+                }
+                var asd = arr11[w].split(' ').filter(Boolean)
+                var ans = asd[1].split('/')
+                var f;
+                var sstr="";
+                var wwww="";
+                for (f = 0; f < ans.length; f++) {
+                    ans[f]=ans[f].replace('[','')
+                    ans[f]=ans[f].replace(']','')
+                    if(ans[f][0]=='<' && ans[f][ans[f].length-1]=='>'){
+                        var v;
+                        var wd="";
+                        for (v = 1; v < ans[f].length-1; v++) {
+                            wd+=ans[f][v]
+                        }
+                        if(wd==lined){
+                            ans[f]=ans[f].replace('<','[<')
+                            ans[f]=ans[f].replace('>','>]')
+                        }
+                        wd=""
+                    }
+                    else{
+                        
+                        if(ans[f]==lined){
+                            ans[f]=sstr.concat("[",ans[f],"]")
+                        }
+                    }
+                    sstr="";
+                    wwww+=ans[f];
+                    if(f < ans.length-1){
+                        wwww+="/"
+                    }
+                }
+                sstr=""
+                var www = sstr.concat(asd[0]," ",wwww)
+                wwww="";
+                sstr=""
+                if(w < arr11.length-1){
+                    ww += sstr.concat(www.trim(),". | ")
+                }
+                else{
+                    ww += sstr.concat(www,".")
+                }
+            }
+        answers[i].text=ww;
+        }
+        if(type === "Расставить слова в правильном порядке"){
+            var sss = answer.querySelectorAll('#word3')
+            var x;
+            var ss="";
+            for (x = 0; x < sss.length; x++) {
+                if(x < sss.length-1){
+                    ss+=sss[x].value+"/"
+                }
+                else{
+                    ss+=sss[x].value
+                }
+            }
+            var ee="";
+            answers[i].text=ee.concat(ss,'|',text);
+            var ee="";
+        }
+        if(type === "Matching – соединить значения / 2 части предложения"){
+            var ccc = answer.querySelectorAll('input')
+            var adw = text.split(',').filter(Boolean)
+            var awd = [];
+            var s;
+            var dsd="";
+            for (s = 0; s < ccc.length-1; s++) { 
+                awd.push(dsd.concat('[ ',ccc[s].value,' - ',ccc[s+1].value,' ]'))
+                s=s+1;
+                dsd=""
+            }
+            var o;
+            var xzc=""
+            for (o = 0; o < adw.length; o++) {
+                adw[o] = adw[o].replace('[',dsd.concat(awd[o],'/['))
+                dsd="";
+                xzc+=adw[o];
+                if(o < adw.length-1 ){
+                    xzc+=",";
+                }
+            }
+            answers[i].text=xzc
+        }
+        if(type === "Вписать ответ в таблицу"){
+            var caca = answer.querySelectorAll('input')
+            tables = text.split(',').filter(Boolean)
+            var q;
+            var sss="";
+            for (q = 0; q < tables.length; q++) { 
+                variants = tables[q].split(':')
+                var vv = variants[1].split('/').filter(Boolean)
+                var ss = "";
+                var x;
+                ss+=variants[0];
+                ss+=" : ";
+                for (x=(vv.length*q);x<vv.length+(vv.length*q);x++){
+                    ss+=caca[x].value;
+                    if(x<vv.length+(vv.length*q)-1){
+                        ss+="/";
+                    }
+                }
+                sss+=ss;
+                if(q < tables.length-1){
+                    sss+=" , "
+                }
+                ss=""
+            }
+            answers[i].text=sss
+        }
+        if(type === "Отметить правильные ответы и исправить не верные"){
+            var iii = answer.querySelectorAll('input')
+            var z;
+            var elms = text.split(',').filter(Boolean)
+            var wdwd = "";
+            var o;
+            for (o = 0; o < elms.length; o++) {
+                wdwd+=iii[o].value
+                wdwd+="/"
+                if(elms[o].split('/').filter(Boolean)[1]){
+                    wdwd+=elms[o].split('/').filter(Boolean)[1]
+                }
+                else{
+                    wdwd+=elms[o].split('/').filter(Boolean)[0]
+                }
+                if(o < elms.length-1){
+                    wdwd+=","
+                }
+            }
+            answers[i].text=wdwd;
+        }
+
+    }
+    
+}
+
+document.addEventListener('click', function(e){
+    zxc();
+    var result = JSON.stringify(answers);
+    console.log(result) 
+});
+
+</script>
 {% endblock %}

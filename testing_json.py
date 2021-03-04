@@ -111,9 +111,9 @@ json_file_8 = {
 json_file_8_answer = {
     'id':8,
     "text" : {
-        "asdasd1" : "asdasd/asdasd/asdasd/asdasd|asdasd/asdasd/asdasd/asdasd",
-        "asdasd2" : "asdasd/asdasd/asdasd/asdasd|asdasd/asdasd/asdasd/asdasd",
-        "asdasd3" : "asdasdwad/asdasd/asdasd/asdasd|asdasd/asdasd/asdasd/asdasd",
+        "asdasd1 : asdasd/asdasd/asdasd/asdasd|asdasd/asdasd/asdasd/asdasd",
+        "asdasd2 : asdasd/asdasd/asdasd/asdasd|asdasd/asdasd/asdasd/asdasd",
+        "asdasd3 : asdasdwad/asdasd/asdasd/asdasd|asdasd/asdasd/asdasd/asdasd",
     }
 }
 json_file_9 = {
